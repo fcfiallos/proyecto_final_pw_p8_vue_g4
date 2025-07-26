@@ -1,14 +1,18 @@
 <template>
   <div class="producto">
     <h1>Gestión de Productos</h1>
-    <p>Contenido de la vista de productos aquí</p>
+    <Producto />
   </div>
 </template>
 
 <script>
+import Producto from "@/components/Producto.vue";
 export default {
-  name: 'ProductoView'
-}
+  name: "ProductoView",
+  components: {
+    Producto,
+  },
+};
 </script>
 
 <style scoped>
