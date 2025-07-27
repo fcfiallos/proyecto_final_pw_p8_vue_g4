@@ -112,11 +112,7 @@
         <label for="bodega">Bodega</label>
         <select v-model.number="bodegaId" id="bodega">
           <option value="">Selecciona una bodega</option>
-          <option
-            v-for="bodega in bodegasDisponibles"
-            :key="bodega.id || bodega.codigo"
-            :value="bodega.id || bodega.codigo"
-          >
+          <option v-for="bodega in bodegasDisponibles" :key="bodega.id || bodega.codigo" :value="bodega.id || bodega.codigo">
             {{ bodega.nombre }} - {{ bodega.ubicacion }}
           </option>
         </select>
@@ -190,11 +186,7 @@
         <label for="bodega2">Bodega</label>
         <select v-model.number="bodegaId" id="bodega2">
           <option value="">Selecciona una bodega</option>
-          <option
-            v-for="bodega in bodegasDisponibles"
-            :key="bodega.id || bodega.codigo"
-            :value="bodega.id || bodega.codigo"
-          >
+          <option v-for="bodega in bodegasDisponibles" :key="bodega.id || bodega.codigo" :value="bodega.id || bodega.codigo">
             {{ bodega.nombre }} - {{ bodega.ubicacion }}
           </option>
         </select>
@@ -289,7 +281,7 @@ export default {
       precio: null,
       stock: null,
       categoria: null,
-      bodegaId: null, // Código de la bodega seleccionada (string)
+      bodegaId: null, // ID de la bodega seleccionada (number)
       bodegaNombre: null, // Nombre de la bodega para mostrar en consulta
       bodegasDisponibles: [], // Lista de bodegas del backend
       cargandoBodegas: false, // Estado de carga de bodegas
@@ -401,13 +393,9 @@ export default {
         this.stock = response.stock;
         this.categoria = response.categoria;
         // Usar ID si existe, sino código
-        this.bodegaId = response.bodega
-          ? response.bodega.id || response.bodega.codigo
-          : null;
-        this.bodegaNombre = response.bodega
-          ? `${response.bodega.nombre} - ${response.bodega.ubicacion}`
-          : null;
-
+        this.bodegaId = response.bodega ? (response.bodega.id || response.bodega.codigo) : null;
+        this.bodegaNombre = response.bodega ? `${response.bodega.nombre} - ${response.bodega.ubicacion}` : null;
+        
         // Convertir los impuestos del backend (objetos) a IDs para los checkboxes
         this.impuestosSeleccionados = response.impuestos
           ? response.impuestos.map((imp) => imp.id)
@@ -470,13 +458,12 @@ export default {
         }
 
         // Encontrar la bodega seleccionada
-        const bodegaSeleccionada = this.bodegasDisponibles.find(
-          (b) =>
-            (b.id && b.id === this.bodegaId) ||
-            (b.codigo && b.codigo === this.bodegaId)
+        const bodegaSeleccionada = this.bodegasDisponibles.find(b => 
+          (b.id && b.id === this.bodegaId) || 
+          (b.codigo && b.codigo === this.bodegaId)
         );
-
-        console.log("Bodega seleccionada:", bodegaSeleccionada);
+        
+        console.log('Bodega seleccionada:', bodegaSeleccionada);
 
         const producto = {
           codigoBarras: this.codigoBarras.trim(),
@@ -485,19 +472,23 @@ export default {
           precio: parseFloat(this.precio),
           stock: parseInt(this.stock),
           // Enviar solo el código de la bodega
-          bodega: {
-            codigo: this.bodegaId,
+          bodega: { 
+            codigo: this.bodegaId 
           },
-          // Los impuestos ahora son solo IDs, los obtiene el componente GeneradorImpuesto
-          impuestos: this.impuestosSeleccionados.map((impuestoId) => ({
-            id: impuestoId,
-          })),
+          impuestos: this.impuestosSeleccionados.map(impuestoId => {
+            const impuesto = this.impuestosDisponibles.find(imp => imp.id === impuestoId);
+            return {
+              id: impuesto.id,
+              nombre: impuesto.nombre,
+              valor: impuesto.valor
+            };
+          }),
         };
-
-        console.log("=== PRODUCTO A ENVIAR ===");
-        console.log("Estructura completa:", JSON.stringify(producto, null, 2));
-        console.log("bodega.codigo:", producto.bodega.codigo);
-        console.log("========================");
+        
+        console.log('=== PRODUCTO A ENVIAR ===');
+        console.log('Estructura completa:', JSON.stringify(producto, null, 2));
+        console.log('bodega.codigo:', producto.bodega.codigo);
+        console.log('========================');
         await guardarFachada(producto);
         this.exitoMensaje = "Producto guardado exitosamente";
         this.limpiarFormularios();
@@ -545,13 +536,12 @@ export default {
         }
 
         // Encontrar la bodega seleccionada
-        const bodegaSeleccionada = this.bodegasDisponibles.find(
-          (b) =>
-            (b.id && b.id === this.bodegaId) ||
-            (b.codigo && b.codigo === this.bodegaId)
+        const bodegaSeleccionada = this.bodegasDisponibles.find(b => 
+          (b.id && b.id === this.bodegaId) || 
+          (b.codigo && b.codigo === this.bodegaId)
         );
-
-        console.log("Bodega seleccionada para actualizar:", bodegaSeleccionada);
+        
+        console.log('Bodega seleccionada para actualizar:', bodegaSeleccionada);
 
         const producto = {
           nombre: this.nombre.trim(),
@@ -559,20 +549,24 @@ export default {
           precio: parseFloat(this.precio),
           stock: parseInt(this.stock),
           // Enviar solo el código de la bodega
-          bodega: {
-            codigo: this.bodegaId,
+          bodega: { 
+            codigo: this.bodegaId 
           },
-          // Los impuestos ahora son solo IDs, los obtiene el componente GeneradorImpuesto
-          impuestos: this.impuestosSeleccionados.map((impuestoId) => ({
-            id: impuestoId,
-          })),
+          impuestos: this.impuestosSeleccionados.map(impuestoId => {
+            const impuesto = this.impuestosDisponibles.find(imp => imp.id === impuestoId);
+            return {
+              id: impuesto.id,
+              nombre: impuesto.nombre,
+              valor: impuesto.valor
+            };
+          }),
         };
-
-        console.log("=== PRODUCTO A ACTUALIZAR ===");
-        console.log("Estructura completa:", JSON.stringify(producto, null, 2));
-        console.log("bodega.codigo:", producto.bodega.codigo);
-        console.log("============================");
-
+        
+        console.log('=== PRODUCTO A ACTUALIZAR ===');
+        console.log('Estructura completa:', JSON.stringify(producto, null, 2));
+        console.log('bodega.codigo:', producto.bodega.codigo);
+        console.log('============================');
+        
         await actualizarFachada(producto, this.codigoBarras.trim());
         this.exitoMensaje = "Producto actualizado exitosamente";
         this.limpiarFormularios();
