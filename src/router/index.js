@@ -9,14 +9,6 @@ const routes = [
     meta: { requiereAuth: true }
   },
   {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
-  },
-  {
     path: '/login',
     name: 'login',
     component: () => import('@/views/LoginView.vue')
@@ -24,27 +16,38 @@ const routes = [
   {
     path: '/bodega',
     name: 'bodega',
-    component: () => import('@/views/BodegaView.vue')
+    component: () => import('@/views/BodegaView.vue'),
+    meta: { requiereAuth: true }
   },
   {
     path: '/cliente',
     name: 'cliente',
-    component: () => import('@/views/ClienteView.vue')
+    component: () => import('@/views/ClienteView.vue'),
+    meta: { requiereAuth: true }
   },
   {
     path: '/producto',
     name: 'producto',
-    component: () => import('@/views/ProductoView.vue')
+    component: () => import('@/views/ProductoView.vue'),
+    meta: { requiereAuth: true }
   },
   {
     path: '/factura',
     name: 'factura',
-    component: () => import('@/views/FacturaView.vue')
+    component: () => import('@/views/FacturaView.vue'),
+    meta: { requiereAuth: true }
   },
   {
     path: '/reporte-factura',
     name: 'reporteFactura',
-    component: () => import('@/views/ReporteFacturaView.vue')
+    component: () => import('@/views/ReporteFacturaView.vue'),
+    meta: { requiereAuth: true }
+  },
+
+  {
+    path: '/about',
+    name: 'about',
+    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
   }
 ]
 
@@ -53,16 +56,29 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to, from, next) => {
-  const estaLogueado = !!localStorage.getItem('cedula_usuario');
 
-  if (to.meta.requiereAuth && !estaLogueado) {
+router.beforeEach((to, from, next) => {
+
+  const necesitaAuth = to.meta.requiereAuth;
+  console.log(`La ruta '${to.path}' necesita autenticación:`, necesitaAuth);
+
+  const cedulaGuardada = localStorage.getItem('cedula_usuario');
+  const estaLogueado = !!cedulaGuardada;
+  console.log(`¿Usuario está logueado? (hay cédula guardada):`, estaLogueado, `(Valor: ${cedulaGuardada})`);
+
+  // 3. Aplicamos la lógica de redirección
+  if (necesitaAuth && !estaLogueado) {
 
     next({ name: 'login' });
+  } else if (to.name === 'login' && estaLogueado) {
+
+    next({ name: 'home' });
   } else {
 
     next();
   }
 });
+
+
 
 export default router
