@@ -5,7 +5,8 @@ const routes = [
   {
     path: '/',
     name: 'home',
-    component: HomeView
+    component: HomeView,
+    meta: { requiereAuth: true }
   },
   {
     path: '/about',
@@ -16,27 +17,32 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
   },
   {
+    path: '/login',
+    name: 'login',
+    component: () => import('@/views/LoginView.vue')
+  },
+  {
     path: '/bodega',
     name: 'bodega',
     component: () => import('@/views/BodegaView.vue')
   },
   {
-    path:'/cliente',
+    path: '/cliente',
     name: 'cliente',
     component: () => import('@/views/ClienteView.vue')
   },
   {
-    path:'/producto',
+    path: '/producto',
     name: 'producto',
     component: () => import('@/views/ProductoView.vue')
   },
   {
-    path:'/factura',
+    path: '/factura',
     name: 'factura',
     component: () => import('@/views/FacturaView.vue')
   },
   {
-    path:'/reporte-factura',
+    path: '/reporte-factura',
     name: 'reporteFactura',
     component: () => import('@/views/ReporteFacturaView.vue')
   }
@@ -46,5 +52,17 @@ const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
 })
+
+router.beforeEach((to, from, next) => {
+  const estaLogueado = !!localStorage.getItem('cedula_usuario');
+
+  if (to.meta.requiereAuth && !estaLogueado) {
+
+    next({ name: 'login' });
+  } else {
+
+    next();
+  }
+});
 
 export default router

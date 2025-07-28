@@ -8,15 +8,19 @@
       />
       <h1>Gestión de Clientes</h1>
     </div>
+    <div></div>
   </div>
+  <Cliente />
 </template>
 
 <script>
 import BotonRegresar from "@/components/BotonRegresar.vue";
+import Cliente from "@/components/Cliente.vue";
 export default {
   name: "ClienteView",
   components: {
     BotonRegresar,
+    Cliente,
   },
 };
 </script>
