@@ -13,7 +13,7 @@
                     Por favor, ingrese su cédula y apellido
                   </p>
 
-                  <div class="form-outline form-black mb-4">
+                  <div class="form-outline form-black mb-4 text-start">
                     <input
                       type="text"
                       id="typeCedulaX"
@@ -23,7 +23,7 @@
                     <label class="form-label" for="typeCedulaX">Cédula</label>
                   </div>
 
-                  <div class="form-outline form-black mb-4">
+                  <div class="form-outline form-black mb-4 text-start">
                     <input
                       type="password"
                       id="typePasswordX"
@@ -47,7 +47,7 @@
                   <h2 class="fw-bold mb-2 text-uppercase">Registro</h2>
                   <p class="text-dark-50 mb-5">Cree su cuenta de cliente</p>
 
-                  <div class="form-outline form-black mb-4">
+                  <div class="form-outline form-black mb-4 text-start">
                     <input
                       type="text"
                       id="registerCedula"
@@ -64,7 +64,7 @@
                     >
                   </div>
 
-                  <div class="form-outline form-black mb-4">
+                  <div class="form-outline form-black mb-4 text-start">
                     <input
                       type="text"
                       id="registerNombre"
@@ -81,7 +81,7 @@
                     >
                   </div>
 
-                  <div class="form-outline form-black mb-4">
+                  <div class="form-outline form-black mb-4 text-start">
                     <input
                       type="text"
                       id="registerApellido"
@@ -98,7 +98,7 @@
                     >
                   </div>
 
-                  <div class="form-outline form-black mb-4">
+                  <div class="form-outline form-black mb-4 text-start">
                     <input
                       type="text"
                       id="registerDireccion"
@@ -115,14 +115,14 @@
                     >
                   </div>
 
-                  <div class="form-outline form-black mb-4">
+                  <div class="form-outline form-black mb-4 text-start">
                     <input
                       type="text"
                       id="registerTelefono"
                       class="form-control form-control-lg"
                       v-model="cliente.telefono"
                     />
-                    <label class="form-label" for="registerTelefono"
+                    <label class="form-label " for="registerTelefono"
                       >Teléfono</label
                     >
                     <span
@@ -132,7 +132,7 @@
                     >
                   </div>
 
-                  <div class="form-outline form-black mb-4">
+                  <div class="form-outline form-black mb-4 text-start">
                     <input
                       type="email"
                       id="registerEmail"
@@ -410,5 +410,8 @@ export default {
 
 .card-body {
   position: relative;
+}
+.form-label{
+  margin: 10px 0;
 }
 </style>

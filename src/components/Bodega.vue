@@ -2,7 +2,7 @@
   <div class="container-bodega">
     <div class="header-container">
       <BotonRegresar :accion="regresarAOpciones" v-if="opcionSeleccionada" />
-      <h2>¿Qué acción deseas realizar con las bodegas?</h2>
+      <h2 v-if="!opcionSeleccionada">¿Qué acción deseas realizar con las bodegas?</h2>
     </div>
     <OpcionesSeleccion
       :cartas="cartas"

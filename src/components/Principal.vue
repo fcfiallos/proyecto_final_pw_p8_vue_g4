@@ -66,7 +66,9 @@ export default {
 
 <style scoped>
 .hello {
+  margin: 10px auto;
   padding: 20px;
+  width: 90%;
 }
 
 h1 {
