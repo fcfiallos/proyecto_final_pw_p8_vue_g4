@@ -2,7 +2,9 @@
   <div class="container-producto">
     <div class="header-container">
       <BotonRegresar :accion="regresarAOpciones" v-if="opcionSeleccionada" />
-      <h2 v-if="!opcionSeleccionada">¿Qué acción deseas realizar con los productos?</h2>
+      <h2 v-if="!opcionSeleccionada">
+        ¿Qué acción deseas realizar con los productos?
+      </h2>
     </div>
     <OpcionesSeleccion
       :cartas="cartas"
@@ -112,7 +114,11 @@
         <label for="bodega">Bodega</label>
         <select v-model.number="bodegaId" id="bodega">
           <option value="">Selecciona una bodega</option>
-          <option v-for="bodega in bodegasDisponibles" :key="bodega.id || bodega.codigo" :value="bodega.id || bodega.codigo">
+          <option
+            v-for="bodega in bodegasDisponibles"
+            :key="bodega.id || bodega.codigo"
+            :value="bodega.id || bodega.codigo"
+          >
             {{ bodega.nombre }} - {{ bodega.ubicacion }}
           </option>
         </select>
@@ -155,7 +161,12 @@
       <button class="boton" @click="consultar">Consultar</button>
       <div class="formulario">
         <label for="nombre">Nombre</label>
-        <input type="text" v-model="nombre" id="nombre" placeholder="Nombre del producto"/>
+        <input
+          type="text"
+          v-model="nombre"
+          id="nombre"
+          placeholder="Nombre del producto"
+        />
         <span v-if="mensaje.nombreMensaje"
           ><i class="bi bi-exclamation-circle"></i>
           {{ mensaje.nombreMensaje }}</span
@@ -171,13 +182,24 @@
           {{ mensaje.categoriaMensaje }}</span
         >
         <label for="precio">Precio</label>
-        <input type="number" step="0.01" v-model="precio" id="precio" placeholder="Precio del producto"/>
+        <input
+          type="number"
+          step="0.01"
+          v-model="precio"
+          id="precio"
+          placeholder="Precio del producto"
+        />
         <span v-if="mensaje.precioMensaje"
           ><i class="bi bi-exclamation-circle"></i>
           {{ mensaje.precioMensaje }}</span
         >
         <label for="stock">Stock</label>
-        <input type="number" v-model="stock" id="stock" placeholder="Stock del producto"/>
+        <input
+          type="number"
+          v-model="stock"
+          id="stock"
+          placeholder="Stock del producto"
+        />
         <span v-if="mensaje.stockMensaje"
           ><i class="bi bi-exclamation-circle"></i>
           {{ mensaje.stockMensaje }}</span
@@ -186,7 +208,11 @@
         <label for="bodega2">Bodega</label>
         <select v-model.number="bodegaId" id="bodega2">
           <option value="">Selecciona una bodega</option>
-          <option v-for="bodega in bodegasDisponibles" :key="bodega.id || bodega.codigo" :value="bodega.id || bodega.codigo">
+          <option
+            v-for="bodega in bodegasDisponibles"
+            :key="bodega.id || bodega.codigo"
+            :value="bodega.id || bodega.codigo"
+          >
             {{ bodega.nombre }} - {{ bodega.ubicacion }}
           </option>
         </select>
@@ -301,22 +327,6 @@ export default {
       resultado: false,
     };
   },
-  watch: {
-    // Watch para detectar cambios en bodegaId
-    bodegaId(newVal, oldVal) {
-      console.log(
-        "bodegaId cambió de:",
-        oldVal,
-        "a:",
-        newVal,
-        "tipo:",
-        typeof newVal
-      );
-    },
-  },
-  computed: {
-    // Add any computed properties here if needed
-  },
   methods: {
     seleccionarOpcion(opcion) {
       this.opcionSeleccionada = opcion;
@@ -394,14 +404,18 @@ export default {
         this.stock = response.stock;
         this.categoria = response.categoria;
         // Usar ID si existe, sino código
-        this.bodegaId = response.bodega ? (response.bodega.id || response.bodega.codigo) : null;
-        this.bodegaNombre = response.bodega ? `${response.bodega.nombre} - ${response.bodega.ubicacion}` : null;
-        
+        this.bodegaId = response.bodega
+          ? response.bodega.id || response.bodega.codigo
+          : null;
+        this.bodegaNombre = response.bodega
+          ? `${response.bodega.nombre} - ${response.bodega.ubicacion}`
+          : null;
+
         // Convertir los impuestos del backend (objetos) a IDs para los checkboxes
         this.impuestosSeleccionados = response.impuestos
           ? response.impuestos.map((imp) => imp.id)
           : [];
-          
+
         // Intentar obtener la lista completa de impuestos disponibles para mostrar nombres
         this.impuestosDisponibles = response.impuestos || [];
 
@@ -465,12 +479,13 @@ export default {
         }
 
         // Encontrar la bodega seleccionada
-        const bodegaSeleccionada = this.bodegasDisponibles.find(b => 
-          (b.id && b.id === this.bodegaId) || 
-          (b.codigo && b.codigo === this.bodegaId)
+        const bodegaSeleccionada = this.bodegasDisponibles.find(
+          (b) =>
+            (b.id && b.id === this.bodegaId) ||
+            (b.codigo && b.codigo === this.bodegaId)
         );
-        
-        console.log('Bodega seleccionada:', bodegaSeleccionada);
+
+        console.log("Bodega seleccionada:", bodegaSeleccionada);
 
         // Construir el objeto bodega con la información necesaria
         let bodegaObj = {};
@@ -494,20 +509,20 @@ export default {
           precio: parseFloat(this.precio),
           stock: parseInt(this.stock),
           bodega: bodegaObj,
-          impuestos: this.impuestosSeleccionados.map(id => ({ id }))
+          impuestos: this.impuestosSeleccionados.map((id) => ({ id })),
         };
-        
-        console.log('=== PRODUCTO A ENVIAR ===');
-        console.log('Estructura completa:', JSON.stringify(producto, null, 2));
-        console.log('bodega.id:', producto.bodega.id);
-        console.log('bodega.codigo:', producto.bodega.codigo);
-        console.log('========================');
+
+        console.log("=== PRODUCTO A ENVIAR ===");
+        console.log("Estructura completa:", JSON.stringify(producto, null, 2));
+        console.log("bodega.id:", producto.bodega.id);
+        console.log("bodega.codigo:", producto.bodega.codigo);
+        console.log("========================");
         await guardarFachada(producto);
         this.exitoMensaje = "Producto guardado exitosamente";
         // Retrasar la limpieza del formulario para que el usuario vea el mensaje
         setTimeout(() => {
           this.limpiarFormularios();
-        }, 1500);
+        }, 3500);
       } catch (error) {
         this.errorMensaje = "Error al guardar el producto";
         console.error("Error al guardar el producto:", error);
@@ -520,7 +535,8 @@ export default {
 
         // Validar todos los campos obligatorios
         if (!this.codigoBarras || this.codigoBarras.trim() === "") {
-          this.mensaje.codigoBarrasMensaje = "El código de barras es obligatorio";
+          this.mensaje.codigoBarrasMensaje =
+            "El código de barras es obligatorio";
           hayErrores = true;
         }
         if (!this.nombre || this.nombre.trim() === "") {
@@ -549,16 +565,28 @@ export default {
           return;
         }
 
-        // Debug: Verificar impuestos seleccionados
-        console.log("Impuestos seleccionados para actualizar:", this.impuestosSeleccionados);
-        
+        // Obtener producto actual para comparar cambios (implementación PATCH)
+        let productoActual;
+        try {
+          productoActual = await consultarPorCodigoBarrasFachada(
+            this.codigoBarras.trim()
+          );
+          console.log("Producto actual recuperado:", productoActual);
+        } catch (error) {
+          console.error("Error al obtener el producto actual:", error);
+          this.errorMensaje =
+            "Error al obtener el producto actual para actualizar";
+          return;
+        }
+
         // Encontrar la bodega seleccionada
-        const bodegaSeleccionada = this.bodegasDisponibles.find(b => 
-          (b.id && b.id === this.bodegaId) || 
-          (b.codigo && b.codigo === this.bodegaId)
+        const bodegaSeleccionada = this.bodegasDisponibles.find(
+          (b) =>
+            (b.id && b.id === this.bodegaId) ||
+            (b.codigo && b.codigo === this.bodegaId)
         );
-        
-        console.log('Bodega seleccionada para actualizar:', bodegaSeleccionada);
+
+        console.log("Bodega seleccionada para actualizar:", bodegaSeleccionada);
 
         // Construir el objeto bodega con la información necesaria
         let bodegaObj = {};
@@ -574,29 +602,83 @@ export default {
           // Si no encontramos la bodega, usar el valor seleccionado como fallback
           bodegaObj.id = this.bodegaId;
         }
-        
-        const producto = {
-          nombre: this.nombre.trim(),
-          categoria: this.categoria,
-          precio: parseFloat(this.precio),
-          stock: parseInt(this.stock),
-          bodega: bodegaObj,
-          impuestos: this.impuestosSeleccionados.map(id => ({ id }))
-        };
-        
-        console.log('=== PRODUCTO A ACTUALIZAR ===');
-        console.log('Estructura completa:', JSON.stringify(producto, null, 2));
-        console.log('bodega.id:', producto.bodega.id);
-        console.log('bodega.codigo:', producto.bodega.codigo);
-        console.log('============================');
-        
-        await actualizarFachada(producto, this.codigoBarras.trim());
+
+        // Crear objeto con solo los campos que han cambiado (implementación PATCH)
+        const camposActualizados = {};
+
+        // Comparar y agregar solo los campos que han cambiado
+        if (this.nombre.trim() !== productoActual.nombre) {
+          camposActualizados.nombre = this.nombre.trim();
+        }
+
+        if (this.categoria !== productoActual.categoria) {
+          camposActualizados.categoria = this.categoria;
+        }
+
+        const precioActual = parseFloat(productoActual.precio);
+        const precioNuevo = parseFloat(this.precio);
+        if (precioNuevo !== precioActual) {
+          camposActualizados.precio = precioNuevo;
+        }
+
+        const stockActual = parseInt(productoActual.stock);
+        const stockNuevo = parseInt(this.stock);
+        if (stockNuevo !== stockActual) {
+          camposActualizados.stock = stockNuevo;
+        }
+
+        // Verificar si cambió la bodega
+        const bodegaActualId =
+          productoActual.bodega?.id || productoActual.bodega?.codigo;
+        const bodegaNuevaId = bodegaObj.id || bodegaObj.codigo;
+
+        if (bodegaActualId !== bodegaNuevaId) {
+          camposActualizados.bodega = bodegaObj;
+        }
+
+        // Verificar si cambiaron los impuestos
+        const impuestosActuales =
+          productoActual.impuestos?.map((imp) => imp.id) || [];
+        const impuestosSeleccionadosOrdenados = [
+          ...this.impuestosSeleccionados,
+        ].sort();
+        const impuestosActualesOrdenados = [...impuestosActuales].sort();
+
+        // Comparar arrays de impuestos
+        const impuestosIguales =
+          impuestosActualesOrdenados.length ===
+            impuestosSeleccionadosOrdenados.length &&
+          impuestosActualesOrdenados.every(
+            (id, index) => id === impuestosSeleccionadosOrdenados[index]
+          );
+
+        if (!impuestosIguales) {
+          camposActualizados.impuestos = this.impuestosSeleccionados.map(
+            (id) => ({ id })
+          );
+        }
+
+        // Si no hay campos que actualizar, mostrar mensaje y salir
+        if (Object.keys(camposActualizados).length === 0) {
+          this.exitoMensaje = "No hay cambios que actualizar";
+          return;
+        }
+
+        console.log("=== CAMPOS A ACTUALIZAR (PATCH) ===");
+        console.log(
+          "Campos modificados:",
+          JSON.stringify(camposActualizados, null, 2)
+        );
+        console.log("=================================");
+
+        await actualizarFachada(camposActualizados, this.codigoBarras.trim());
         this.exitoMensaje = "Producto actualizado exitosamente";
         // Retrasar la limpieza del formulario para que el usuario vea el mensaje
         setTimeout(() => {
           this.limpiarFormularios();
-        }, 1500);
+        }, 3500);
       } catch (error) {
+        console.error("Error completo:", error);
         this.errorMensaje = "Error al actualizar el producto";
       }
     },
@@ -620,12 +702,14 @@ export default {
     obtenerNombreImpuesto(impuestoId) {
       // Primero buscamos en impuestosDisponibles
       if (this.impuestosDisponibles && this.impuestosDisponibles.length > 0) {
-        const impuesto = this.impuestosDisponibles.find(imp => imp.id === impuestoId);
+        const impuesto = this.impuestosDisponibles.find(
+          (imp) => imp.id === impuestoId
+        );
         if (impuesto) {
           return `${impuesto.nombre} (${(impuesto.valor * 100).toFixed(2)}%)`;
         }
       }
-      
+
       // Si no lo encontramos, intentamos obtenerlo de los componentes GeneradorImpuesto
       let generadorRef = null;
       if (this.$refs.generadorImpuesto) {
@@ -633,33 +717,48 @@ export default {
       } else if (this.$refs.generadorImpuestoActualizar) {
         generadorRef = this.$refs.generadorImpuestoActualizar;
       }
-      
-      if (generadorRef && typeof generadorRef.getImpuestosDisponibles === 'function') {
+
+      if (
+        generadorRef &&
+        typeof generadorRef.getImpuestosDisponibles === "function"
+      ) {
         const impuestos = generadorRef.getImpuestosDisponibles();
-        const impuesto = impuestos.find(imp => imp.id === impuestoId);
+        const impuesto = impuestos.find((imp) => imp.id === impuestoId);
         if (impuesto) {
           return `${impuesto.nombre} (${(impuesto.valor * 100).toFixed(2)}%)`;
         }
       }
-      
+
       // Si no encontramos información, mostramos solo el ID
       return `Impuesto ID: ${impuestoId}`;
     },
-    
+
     // Método para obtener impuestos disponibles del componente hijo
     obtenerImpuestosDisponibles() {
       // Intentar obtener impuestos desde cualquiera de los componentes GeneradorImpuesto que pueda estar visible
       let generadorRef = null;
-      
-      if (this.opcionSeleccionada === 'guardar' && this.$refs.generadorImpuesto) {
+
+      if (
+        this.opcionSeleccionada === "guardar" &&
+        this.$refs.generadorImpuesto
+      ) {
         generadorRef = this.$refs.generadorImpuesto;
-      } else if (this.opcionSeleccionada === 'actualizar' && this.$refs.generadorImpuestoActualizar) {
+      } else if (
+        this.opcionSeleccionada === "actualizar" &&
+        this.$refs.generadorImpuestoActualizar
+      ) {
         generadorRef = this.$refs.generadorImpuestoActualizar;
       }
-      
-      if (generadorRef && typeof generadorRef.getImpuestosDisponibles === 'function') {
+
+      if (
+        generadorRef &&
+        typeof generadorRef.getImpuestosDisponibles === "function"
+      ) {
         this.impuestosDisponibles = generadorRef.getImpuestosDisponibles();
-        console.log("Impuestos disponibles obtenidos:", this.impuestosDisponibles);
+        console.log(
+          "Impuestos disponibles obtenidos:",
+          this.impuestosDisponibles
+        );
       } else {
         console.warn("No se pudo acceder al método getImpuestosDisponibles");
         // Si no se pudo obtener, simplificar la estructura de impuestos para enviar solo IDs

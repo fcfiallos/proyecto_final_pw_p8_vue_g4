@@ -1,48 +1,52 @@
 <template>
-  <div class="impuestos-section">
+  <div class="impuestos-section container-fluid p-3">
     <div class="impuestos-disponibles">
-      <h5>Impuestos Disponibles</h5>
-      <div class="loading" v-if="cargando">
-        <i class="bi bi-arrow-clockwise"></i> Cargando impuestos...
+      <h5 class="mb-3">Impuestos Disponibles</h5>
+      <div class="loading text-center" v-if="cargando">
+        <i class="bi bi-arrow-clockwise spinner-border-sm me-2"></i> Cargando impuestos...
       </div>
-      <div v-else-if="impuestosDisponibles.length === 0" class="no-impuestos">
+      <div v-else-if="impuestosDisponibles.length === 0" class="no-impuestos text-center p-4">
         <p>No hay impuestos registrados.</p>
         <button
           type="button"
           @click="mostrarFormulario = true"
-          class="btn-crear-impuesto"
+          class="btn btn-success btn-gradient-success"
         >
           <i class="bi bi-plus"></i> Crear Primer Impuesto
         </button>
       </div>
-      <div v-else class="impuestos-grid">
+      <div v-else class="row">
         <div
           v-for="impuesto in impuestosDisponibles"
           :key="impuesto.id"
-          class="impuesto-checkbox"
+          class="col"
         >
-          <label>
-            <input
-              type="checkbox"
-              :value="impuesto.id"
-              v-model="impuestosSeleccionadosLocal"
-              @change="actualizarSeleccionados"
-            />
-            <span class="checkmark"></span>
-            <div class="impuesto-info">
-              <strong>{{ impuesto.nombre }}</strong>
-              <span class="impuesto-valor">{{ (impuesto.valor * 100).toFixed(2) }}%</span>
-              <small v-if="impuesto.descripcion" class="impuesto-descripcion">
-                {{ impuesto.descripcion }}
-              </small>
+          <div class="card h-100 border-hover">
+            <div class="card-body">
+              <label class="d-flex align-items-center w-100 mb-0">
+                <input
+                  type="checkbox"
+                  :value="impuesto.id"
+                  v-model="impuestosSeleccionadosLocal"
+                  @change="actualizarSeleccionados"
+                  class="form-check-input me-3"
+                />
+                <div class="impuesto-info">
+                  <strong>{{ impuesto.nombre }}</strong>
+                  <span class="badge bg-light text-dark">{{ (impuesto.valor * 100).toFixed(2) }}%</span>
+                  <small v-if="impuesto.descripcion" class="text-muted d-block mt-1">
+                    {{ impuesto.descripcion }}
+                  </small>
+                </div>
+              </label>
             </div>
-          </label>
+          </div>
         </div>
       </div>
       <button
         type="button"
         @click="mostrarFormulario = !mostrarFormulario"
-        class="btn-toggle-formulario"
+        class="btn btn-info text-white w-100 mt-3 btn-gradient-info"
         v-if="impuestosDisponibles.length > 0"
       >
         <i class="bi" :class="mostrarFormulario ? 'bi-dash' : 'bi-plus'"></i>
@@ -51,62 +55,67 @@
     </div>
 
     <!-- Formulario para crear nuevo impuesto -->
-    <div v-if="mostrarFormulario" class="formulario-impuesto">
-      <h5>Crear Nuevo Impuesto</h5>
-      <div class="form-group">
-        <label for="nuevoImpuestoNombre">Nombre</label>
-        <input
-          type="text"
-          id="nuevoImpuestoNombre"
-          v-model="nuevoImpuesto.nombre"
-          placeholder="Ej: IVA, ICE, etc."
-          maxlength="50"
-        />
+    <div v-if="mostrarFormulario" class="formulario-impuesto card mt-4 border-primary">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Crear Nuevo Impuesto</h5>
       </div>
-      <div class="form-group">
-        <label for="nuevoImpuestoValor">Valor (%)</label>
-        <input
-          type="number"
-          step="0.0001"
-          min="0"
-          max="100"
-          id="nuevoImpuestoValor"
-          v-model="nuevoImpuesto.valor"
-          placeholder="Ej: 15.0000"
-        />
-        <small class="text-muted">Ingrese el porcentaje (ej: 15 para 15%)</small>
-      </div>
-      <div class="form-group">
-        <label for="nuevoImpuestoDescripcion">Descripción (Opcional)</label>
-        <textarea
-          id="nuevoImpuestoDescripcion"
-          v-model="nuevoImpuesto.descripcion"
-          placeholder="Descripción del impuesto..."
-          maxlength="200"
-          rows="3"
-        ></textarea>
-      </div>
-      <div class="botones-formulario">
-        <button
-          type="button"
-          @click="crearImpuesto"
-          class="btn-guardar-impuesto"
-        >
-          <i class="bi bi-check"></i> Guardar
-        </button>
-        <button
-          type="button"
-          @click="cancelarCreacion"
-          class="btn-cancelar"
-        >
-          <i class="bi bi-x"></i> Cancelar
-        </button>
+      <div class="card-body">
+        <div class="mb-3">
+          <label for="nuevoImpuestoNombre" class="form-label">Nombre</label>
+          <input
+            type="text"
+            id="nuevoImpuestoNombre"
+            v-model="nuevoImpuesto.nombre"
+            placeholder="Ej: IVA, ICE, etc."
+            maxlength="50"
+            class="form-control"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="nuevoImpuestoValor" class="form-label">Valor (%)</label>
+          <input
+            type="number"
+            step="0.0001"
+            min="0"
+            max="100"
+            id="nuevoImpuestoValor"
+            v-model="nuevoImpuesto.valor"
+            placeholder="Ej: 15.0000"
+            class="form-control"
+          />
+          <small class="form-text text-muted">Ingrese el porcentaje (ej: 15 para 15%)</small>
+        </div>
+        <div class="mb-3">
+          <label for="nuevoImpuestoDescripcion" class="form-label">Descripción (Opcional)</label>
+          <textarea
+            id="nuevoImpuestoDescripcion"
+            v-model="nuevoImpuesto.descripcion"
+            placeholder="Descripción del impuesto..."
+            maxlength="200"
+            rows="3"
+            class="form-control"
+          ></textarea>
+        </div>
+        <div class="d-flex gap-2">
+          <button
+            type="button"
+            @click="crearImpuesto"
+            class="btn btn-success flex-grow-1 btn-gradient-success"
+          >
+            <i class="bi bi-check"></i> Guardar
+          </button>
+          <button
+            type="button"
+            @click="cancelarCreacion"
+            class="btn btn-danger flex-grow-1 btn-gradient-danger"
+          >
+            <i class="bi bi-x"></i> Cancelar
+          </button>
+        </div>
       </div>
     </div>
   </div>
-</template>
-
-<script>
+</template><script>
 import {
   obtenerTodosFachada,
   guardarFachada,
@@ -228,29 +237,11 @@ export default {
 </script>
 
 <style scoped>
-/* Estilos para la sección de impuestos */
+/* Custom styles to enhance Bootstrap */
 .impuestos-section {
-  margin: 20px 0;
-  padding: 20px;
-  border: 2px solid #ddd;
   border-radius: 10px;
   background-color: #f9f9f9;
-}
-
-.impuestos-disponibles h5 {
-  color: #333;
-  margin-bottom: 15px;
-  font-weight: 600;
-}
-
-.loading {
-  text-align: center;
-  color: #666;
-  padding: 20px;
-}
-
-.loading i {
-  animation: spin 1s linear infinite;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 @keyframes spin {
@@ -262,202 +253,78 @@ export default {
   }
 }
 
-.no-impuestos {
-  text-align: center;
-  padding: 20px;
-  color: #666;
+.loading i {
+  animation: spin 1s linear infinite;
 }
 
-.btn-crear-impuesto {
-  background: linear-gradient(45deg, #28a745, #20c997);
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 500;
+.border-hover {
   transition: all 0.3s ease;
+  border: 1px solid #dee2e6;
 }
 
-.btn-crear-impuesto:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
-}
-
-.impuestos-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 15px;
-  margin-bottom: 20px;
-}
-
-.impuesto-checkbox {
-  background: white;
-  border: 2px solid #e0e0e0;
-  border-radius: 10px;
-  padding: 15px;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  display: block;
-}
-
-.impuesto-checkbox:hover {
+.border-hover:hover {
   border-color: #007bff;
-  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.15);
+  transform: translateY(-2px);
 }
 
-.impuesto-checkbox label {
-  display: flex;
-  align-items: center;
+.card-body {
+  padding: 1rem;
+}
+
+/* Custom checkboxes */
+.form-check-input {
   cursor: pointer;
-  margin: 0;
-}
-
-.impuesto-checkbox input[type="checkbox"] {
-  margin-right: 12px;
-  transform: scale(1.2);
+  width: 1.2em;
+  height: 1.2em;
 }
 
 .impuesto-info {
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
 
-.impuesto-info strong {
-  color: #333;
-  font-size: 14px;
-}
-
-.impuesto-valor {
-  color: #666;
-  font-size: 12px;
-  margin-top: 2px;
-}
-
-.impuesto-descripcion {
-  display: block;
-  color: #888;
-  font-size: 11px;
-  font-style: italic;
-  margin-top: 2px;
-}
-
-.form-group textarea {
-  width: 100%;
-  padding: 10px;
-  border: 2px solid #ddd;
-  border-radius: 6px;
-  font-size: 14px;
-  transition: border-color 0.3s ease;
-  resize: vertical;
-  font-family: inherit;
-}
-
-.form-group textarea:focus {
-  outline: none;
-  border-color: #007bff;
-}
-
-.form-group .text-muted {
-  font-size: 12px;
-  color: #6c757d;
-  margin-top: 5px;
-  display: block;
-}
-
-.btn-toggle-formulario {
-  background: linear-gradient(45deg, #17a2b8, #6f42c1);
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  width: 100%;
-  margin-top: 10px;
-}
-
-.btn-toggle-formulario:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(23, 162, 184, 0.3);
-}
-
-.formulario-impuesto {
-  background: white;
-  border: 2px solid #007bff;
-  border-radius: 10px;
-  padding: 20px;
-  margin-top: 15px;
-}
-
-.formulario-impuesto h5 {
-  color: #007bff;
-  margin-bottom: 15px;
-}
-
-.form-group {
-  margin-bottom: 15px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 5px;
-  color: #333;
-  font-weight: 500;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 10px;
-  border: 2px solid #ddd;
-  border-radius: 6px;
-  font-size: 14px;
-  transition: border-color 0.3s ease;
-}
-
-.form-group input:focus {
-  outline: none;
-  border-color: #007bff;
-}
-
-.botones-formulario {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.btn-guardar-impuesto {
+/* Button gradients */
+.btn-gradient-success {
   background: linear-gradient(45deg, #28a745, #20c997);
-  color: white;
   border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  flex: 1;
 }
 
-.btn-guardar-impuesto:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+.btn-gradient-info {
+  background: linear-gradient(45deg, #17a2b8, #6f42c1);
+  border: none;
 }
 
-.btn-cancelar {
+.btn-gradient-danger {
   background: linear-gradient(45deg, #dc3545, #c82333);
-  color: white;
   border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  flex: 1;
 }
 
-.btn-cancelar:hover {
+/* Button hover effects */
+.btn-gradient-success:hover,
+.btn-gradient-info:hover, 
+.btn-gradient-danger:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+}
+
+/* Badge for tax value */
+.badge {
+  display: inline-block;
+  margin-top: 4px;
+  font-weight: normal;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .impuestos-section {
+    padding: 15px 10px !important;
+  }
+  
+  .card-body {
+    padding: 0.75rem;
+  }
 }
 </style>
