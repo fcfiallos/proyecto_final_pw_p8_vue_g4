@@ -472,20 +472,34 @@ export default {
         
         console.log('Bodega seleccionada:', bodegaSeleccionada);
 
+        // Construir el objeto bodega con la información necesaria
+        let bodegaObj = {};
+        if (bodegaSeleccionada) {
+          // Incluir tanto id como codigo si están disponibles
+          if (bodegaSeleccionada.id) {
+            bodegaObj.id = bodegaSeleccionada.id;
+          }
+          if (bodegaSeleccionada.codigo) {
+            bodegaObj.codigo = bodegaSeleccionada.codigo;
+          }
+        } else {
+          // Si no encontramos la bodega, usar el valor seleccionado como fallback
+          bodegaObj.id = this.bodegaId;
+        }
+
         const producto = {
           codigoBarras: this.codigoBarras.trim(),
           nombre: this.nombre.trim(),
           categoria: this.categoria,
           precio: parseFloat(this.precio),
           stock: parseInt(this.stock),
-          bodega: { 
-            id: this.bodegaId 
-          },
+          bodega: bodegaObj,
           impuestos: this.impuestosSeleccionados.map(id => ({ id }))
         };
         
         console.log('=== PRODUCTO A ENVIAR ===');
         console.log('Estructura completa:', JSON.stringify(producto, null, 2));
+        console.log('bodega.id:', producto.bodega.id);
         console.log('bodega.codigo:', producto.bodega.codigo);
         console.log('========================');
         await guardarFachada(producto);
@@ -538,19 +552,41 @@ export default {
         // Debug: Verificar impuestos seleccionados
         console.log("Impuestos seleccionados para actualizar:", this.impuestosSeleccionados);
         
+        // Encontrar la bodega seleccionada
+        const bodegaSeleccionada = this.bodegasDisponibles.find(b => 
+          (b.id && b.id === this.bodegaId) || 
+          (b.codigo && b.codigo === this.bodegaId)
+        );
+        
+        console.log('Bodega seleccionada para actualizar:', bodegaSeleccionada);
+
+        // Construir el objeto bodega con la información necesaria
+        let bodegaObj = {};
+        if (bodegaSeleccionada) {
+          // Incluir tanto id como codigo si están disponibles
+          if (bodegaSeleccionada.id) {
+            bodegaObj.id = bodegaSeleccionada.id;
+          }
+          if (bodegaSeleccionada.codigo) {
+            bodegaObj.codigo = bodegaSeleccionada.codigo;
+          }
+        } else {
+          // Si no encontramos la bodega, usar el valor seleccionado como fallback
+          bodegaObj.id = this.bodegaId;
+        }
+        
         const producto = {
           nombre: this.nombre.trim(),
           categoria: this.categoria,
           precio: parseFloat(this.precio),
           stock: parseInt(this.stock),
-          bodega: { 
-            id: this.bodegaId 
-          },
+          bodega: bodegaObj,
           impuestos: this.impuestosSeleccionados.map(id => ({ id }))
         };
         
         console.log('=== PRODUCTO A ACTUALIZAR ===');
         console.log('Estructura completa:', JSON.stringify(producto, null, 2));
+        console.log('bodega.id:', producto.bodega.id);
         console.log('bodega.codigo:', producto.bodega.codigo);
         console.log('============================');
         
