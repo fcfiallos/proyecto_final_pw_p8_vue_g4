@@ -39,7 +39,8 @@ input {
     transition: border-color 0.2s ease;
 }
 
-input:focus , input:hover{
+input:focus,
+input:hover {
     outline: none;
     border-color: #42b983;
 }
@@ -135,7 +136,16 @@ i {
     text-align: left;
 }
 
+ .thead-verde th {
+        background-color: #42b983;
+        color: white;
+        font-weight: 600;
+        border-color: #36a144;
+        
+    }
+
 @media screen and (max-width: 768px) {
+
     .container-consultar,
     .container-guardar,
     .container-actualizar,
@@ -144,7 +154,8 @@ i {
         margin: 10px auto;
     }
 
-    input, select {
+    input,
+    select {
         font-size: 0.9rem;
     }
 
@@ -152,5 +163,5 @@ i {
         padding: 10px;
         font-size: 0.9rem;
     }
-    
+
 }
