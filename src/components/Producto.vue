@@ -307,12 +307,12 @@ export default {
       precio: null,
       stock: null,
       categoria: null,
-      bodegaId: null, // ID de la bodega seleccionada (number)
-      bodegaNombre: null, // Nombre de la bodega para mostrar en consulta
-      bodegasDisponibles: [], // Lista de bodegas del backend
-      cargandoBodegas: false, // Estado de carga de bodegas
-      impuestosSeleccionados: [], // Impuestos seleccionados para este producto
-      impuestosDisponibles: [], // Lista de impuestos disponibles
+      bodegaId: null, 
+      bodegaNombre: null, 
+      bodegasDisponibles: [], 
+      cargandoBodegas: false, 
+      impuestosSeleccionados: [], 
+      impuestosDisponibles: [], 
       errorMensaje: null,
       exitoMensaje: null,
       mensaje: {
@@ -411,17 +411,17 @@ export default {
           ? `${response.bodega.nombre} - ${response.bodega.ubicacion}`
           : null;
 
-        // Convertir los impuestos del backend (objetos) a IDs para los checkboxes
+      
         this.impuestosSeleccionados = response.impuestos
           ? response.impuestos.map((imp) => imp.id)
           : [];
 
-        // Intentar obtener la lista completa de impuestos disponibles para mostrar nombres
+     
         this.impuestosDisponibles = response.impuestos || [];
 
         this.exitoMensaje = "Consulta exitosa";
         this.resultado = true;
-        // No limpiar formularios aquí para mantener los datos consultados
+       
       } catch (error) {
         this.errorMensaje = "Error al consultar el producto";
         this.resultado = false;
@@ -432,7 +432,7 @@ export default {
         this.limpiarMensajes();
         let hayErrores = false;
 
-        // Obtener impuestos disponibles del componente hijo
+        
         this.obtenerImpuestosDisponibles();
 
         // Validar todos los campos obligatorios
@@ -487,10 +487,10 @@ export default {
 
         console.log("Bodega seleccionada:", bodegaSeleccionada);
 
-        // Construir el objeto bodega con la información necesaria
+       
         let bodegaObj = {};
         if (bodegaSeleccionada) {
-          // Incluir tanto id como codigo si están disponibles
+       
           if (bodegaSeleccionada.id) {
             bodegaObj.id = bodegaSeleccionada.id;
           }
@@ -519,7 +519,7 @@ export default {
         console.log("========================");
         await guardarFachada(producto);
         this.exitoMensaje = "Producto guardado exitosamente";
-        // Retrasar la limpieza del formulario para que el usuario vea el mensaje
+       
         setTimeout(() => {
           this.limpiarFormularios();
         }, 3500);
@@ -560,12 +560,12 @@ export default {
           hayErrores = true;
         }
 
-        // Si hay errores, no continuar
+  
         if (hayErrores) {
           return;
         }
 
-        // Obtener producto actual para comparar cambios (implementación PATCH)
+   
         let productoActual;
         try {
           productoActual = await consultarPorCodigoBarrasFachada(
@@ -588,10 +588,10 @@ export default {
 
         console.log("Bodega seleccionada para actualizar:", bodegaSeleccionada);
 
-        // Construir el objeto bodega con la información necesaria
+      
         let bodegaObj = {};
         if (bodegaSeleccionada) {
-          // Incluir tanto id como codigo si están disponibles
+     
           if (bodegaSeleccionada.id) {
             bodegaObj.id = bodegaSeleccionada.id;
           }
@@ -599,14 +599,13 @@ export default {
             bodegaObj.codigo = bodegaSeleccionada.codigo;
           }
         } else {
-          // Si no encontramos la bodega, usar el valor seleccionado como fallback
+        
           bodegaObj.id = this.bodegaId;
         }
 
-        // Crear objeto con solo los campos que han cambiado (implementación PATCH)
         const camposActualizados = {};
 
-        // Comparar y agregar solo los campos que han cambiado
+      
         if (this.nombre.trim() !== productoActual.nombre) {
           camposActualizados.nombre = this.nombre.trim();
         }
@@ -627,7 +626,7 @@ export default {
           camposActualizados.stock = stockNuevo;
         }
 
-        // Verificar si cambió la bodega
+  
         const bodegaActualId =
           productoActual.bodega?.id || productoActual.bodega?.codigo;
         const bodegaNuevaId = bodegaObj.id || bodegaObj.codigo;
@@ -636,7 +635,7 @@ export default {
           camposActualizados.bodega = bodegaObj;
         }
 
-        // Verificar si cambiaron los impuestos
+  
         const impuestosActuales =
           productoActual.impuestos?.map((imp) => imp.id) || [];
         const impuestosSeleccionadosOrdenados = [
@@ -644,7 +643,7 @@ export default {
         ].sort();
         const impuestosActualesOrdenados = [...impuestosActuales].sort();
 
-        // Comparar arrays de impuestos
+       
         const impuestosIguales =
           impuestosActualesOrdenados.length ===
             impuestosSeleccionadosOrdenados.length &&
@@ -658,7 +657,6 @@ export default {
           );
         }
 
-        // Si no hay campos que actualizar, mostrar mensaje y salir
         if (Object.keys(camposActualizados).length === 0) {
           this.exitoMensaje = "No hay cambios que actualizar";
           return;
@@ -673,7 +671,7 @@ export default {
 
         await actualizarFachada(camposActualizados, this.codigoBarras.trim());
         this.exitoMensaje = "Producto actualizado exitosamente";
-        // Retrasar la limpieza del formulario para que el usuario vea el mensaje
+       
         setTimeout(() => {
           this.limpiarFormularios();
         }, 3500);
@@ -698,9 +696,9 @@ export default {
         console.error("Error al eliminar el producto:", error);
       }
     },
-    // Método para obtener el nombre de un impuesto a partir de su ID
+ 
     obtenerNombreImpuesto(impuestoId) {
-      // Primero buscamos en impuestosDisponibles
+   
       if (this.impuestosDisponibles && this.impuestosDisponibles.length > 0) {
         const impuesto = this.impuestosDisponibles.find(
           (imp) => imp.id === impuestoId
@@ -710,7 +708,7 @@ export default {
         }
       }
 
-      // Si no lo encontramos, intentamos obtenerlo de los componentes GeneradorImpuesto
+   
       let generadorRef = null;
       if (this.$refs.generadorImpuesto) {
         generadorRef = this.$refs.generadorImpuesto;
@@ -729,13 +727,13 @@ export default {
         }
       }
 
-      // Si no encontramos información, mostramos solo el ID
+      
       return `Impuesto ID: ${impuestoId}`;
     },
 
-    // Método para obtener impuestos disponibles del componente hijo
+
     obtenerImpuestosDisponibles() {
-      // Intentar obtener impuestos desde cualquiera de los componentes GeneradorImpuesto que pueda estar visible
+
       let generadorRef = null;
 
       if (
@@ -761,7 +759,7 @@ export default {
         );
       } else {
         console.warn("No se pudo acceder al método getImpuestosDisponibles");
-        // Si no se pudo obtener, simplificar la estructura de impuestos para enviar solo IDs
+      
         this.impuestosDisponibles = [];
       }
     },

@@ -9,10 +9,10 @@ const obtenerTodas = async () => {
     } catch (error) {
         console.error('Error al obtener todas las bodegas:', error);
         
-        // Si es error 405, probablemente el endpoint no está implementado
+      
         if (error.response && error.response.status === 405) {
             console.warn('Endpoint GET /bodegas no está implementado en el backend');
-            // Retornar array vacío como fallback
+        
             return [];
         }
         

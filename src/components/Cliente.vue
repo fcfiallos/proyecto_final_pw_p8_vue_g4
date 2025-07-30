@@ -301,15 +301,14 @@ export default {
     },
 
     async guardar() {
-      // 1. Limpiamos todos los mensajes previos
+      
       this.exitoMensaje = null;
-      this.errorMensaje = null; // Para errores generales del API
-      this.limpiarMensajesValidacion(); // Para errores de campo
+      this.errorMensaje = null; 
+      this.limpiarMensajesValidacion(); 
 
-      let hayErrores = false; // Bandera para saber si podemos continuar
+      let hayErrores = false; 
 
-      // --- INICIO DEL BLOQUE DE VALIDACIONES (VERSIÓN CORREGIDA) ---
-
+     
       // Validación para Cédula
       const cedulaStr = String(this.cliente.cedula || "").trim();
       if (cedulaStr === "") {

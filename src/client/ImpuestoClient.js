@@ -78,7 +78,6 @@ const eliminar = async (id) => {
     }
 }
 
-// Funciones fachada para exportar
 export const obtenerTodosFachada = async () => {
     return await obtenerTodos();
 }
