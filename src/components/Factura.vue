@@ -268,78 +268,76 @@ export default {
     async guardarFactura() {
       // Validación de campos obligatorios
       if (
-        !this.ruc ||
-        !this.numeroDocumento ||
-        !this.establecimiento ||
-        !this.puntoEmision ||
-        !this.fechaActual ||
-        !this.clienteCedula ||
-        !this.cliente.nombre ||
-        this.items.length === 0
-      ) {
-        alert(
-          "Por favor, complete todos los campos obligatorios y agregue al menos un producto."
-        );
-        return;
-      }
+    !this.ruc ||
+    !this.numeroDocumento ||
+    !this.establecimiento ||
+    !this.puntoEmision ||
+    !this.fechaActual ||
+    !this.clienteCedula ||
+    !this.cliente.nombre ||
+    this.items.length === 0
+  ) {
+    alert(
+      "Por favor, complete todos los campos obligatorios y agregue al menos un producto."
+    );
+    return;
+  }
 
-      try {
-        const factura = {
-          rucEmpresa: String(this.ruc),
-          numeroDocumento: String(this.numeroDocumento),
-          establecimiento: String(this.establecimiento),
-          puntoEmision: String(this.puntoEmision),
-          fechaEmision: this.fechaActual,
-          cedulaCliente: String(this.clienteCedula),
-          subtotal: Number(this.subtotalGeneral),
-          totalImpuestos: Number(this.totalImpuestos.toFixed(2)),
-          total: Number(this.totalFactura),
-        };
-        // Guardar factura y obtener el id
-        const facturaGuardada = await guardarFacturaFachada(factura);
-        const facturaId = facturaGuardada.id; 
+  try {
+    const factura = {
+      rucEmpresa: String(this.ruc),
+      numeroDocumento: String(this.numeroDocumento),
+      establecimiento: String(this.establecimiento),
+      puntoEmision: String(this.puntoEmision),
+      fechaEmision: this.fechaActual,
+      cedulaCliente: String(this.clienteCedula),
+      subtotal: Number(this.subtotalGeneral),
+      totalImpuestos: Number(this.totalImpuestos.toFixed(2)),
+      total: Number(this.totalFactura),
+    };
+    // Guardar factura y obtener el id
+    const facturaGuardada = await guardarFacturaFachada(factura);
+    console.log("Factura guardada:", facturaGuardada);
 
-        // Guardar los detalles
-        await this.guardarDetalles(facturaId);
+    // Prepara el array de detalles
+    const detalles = this.items.map(item => {
+      const totalImpuestosDetalle = (item.impuestos || []).reduce(
+        (sum, imp) => {
+          const porcentaje = imp.valor;
+          return sum + item.subtotal * porcentaje;
+        },
+        0
+      );
+      return {
+        codigoBarras: item.codigo,
+        cantidad: item.cantidad,
+        precio: item.precio,
+        subtotal: item.subtotal,
+        totalImpuestos: totalImpuestosDetalle,
+        facturaId: facturaGuardada,
+      };
+    });
 
-        // Limpieza de campos
-        this.items = [];
-        this.cliente = {};
-        this.codigoBarraProducto = null;
-        this.clienteCedula = null;
-        this.producto = {};
-        this.cantidad = 0;
-        this.precio = 0;
-        this.ruc = "";
-        this.numeroDocumento = "";
-        this.establecimiento = "";
-        this.puntoEmision = "";
-      } catch (error) {
-        console.error("Error al guardar la factura o detalles:", error);
-      }
-    },
+    // Guarda todos los detalles en lote
+    await guardarDetalleFacturaFachada(detalles);
+    console.log("Detalles guardados:", detalles);
 
-    async guardarDetalles(facturaId) {
-      for (const item of this.items) {
-        const totalImpuestosDetalle = (item.impuestos || []).reduce(
-          (sum, imp) => {
-            const porcentaje = imp.valor - 1;
-            return sum + item.subtotal * porcentaje;
-          },
-          0
-        );
-
-        const detalle = {
-          codigoBarras: item.codigo,
-          cantidad: item.cantidad,
-          precio: item.precio,
-          subtotal: item.subtotal,
-          totalImpuestos: totalImpuestosDetalle,
-          facturaId: facturaId,
-        };
-        await guardarDetalleFacturaFachada(detalle);
-      }
-    },
+    // Limpieza de campos
+    this.items = [];
+    this.cliente = {};
+    this.codigoBarraProducto = null;
+    this.clienteCedula = null;
+    this.producto = {};
+    this.cantidad = 0;
+    this.precio = 0;
+    this.ruc = "";
+    this.numeroDocumento = "";
+    this.establecimiento = "";
+    this.puntoEmision = "";
+  } catch (error) {
+    console.error("Error al guardar la factura o detalles:", error);
+  }
+},
     agregarItem() {
       if (
         this.producto &&
