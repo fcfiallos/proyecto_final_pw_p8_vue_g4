@@ -165,12 +165,11 @@ export default {
       }
     },
 
-    // Actualizar seleccionados en el componente padre
     actualizarSeleccionados() {
       this.$emit("update:impuestos-seleccionados", this.impuestosSeleccionadosLocal);
     },
 
-    // Crear nuevo impuesto
+  
     async crearImpuesto() {
       if (!this.nuevoImpuesto.nombre || !this.nuevoImpuesto.valor) {
         this.$emit("error-impuesto", "Nombre y valor son obligatorios para crear un impuesto");
@@ -186,7 +185,6 @@ export default {
       }
 
       try {
-        // Convertir el porcentaje a decimal para el backend (15% -> 0.15)
         const impuestoParaEnviar = {
           nombre: this.nuevoImpuesto.nombre.trim(),
           valor: parseFloat(this.nuevoImpuesto.valor) / 100,
@@ -214,14 +212,13 @@ export default {
       }
     },
 
-    // Cancelar creación de impuesto
     cancelarCreacion() {
       this.mostrarFormulario = false;
       this.nuevoImpuesto = { nombre: "", valor: 0, descripcion: "" };
       this.$emit("limpiar-mensajes");
     },
 
-    // Obtener impuestos seleccionados como objetos completos
+ 
     obtenerImpuestosSeleccionadosCompletos() {
       return this.impuestosSeleccionadosLocal
         .map(impuestoId => {
@@ -237,7 +234,7 @@ export default {
 </script>
 
 <style scoped>
-/* Custom styles to enhance Bootstrap */
+
 .impuestos-section {
   border-radius: 10px;
   background-color: #f9f9f9;

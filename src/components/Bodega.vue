@@ -213,7 +213,7 @@ export default {
         setTimeout(() => {
           this.exitoMensaje = null;
         }, 3000);
-        // No limpiar formularios aquí para mantener los datos consultados
+      
       } catch (error) {
         this.errorMensaje = "Error al consultar la bodega";
         this.resultado = false;
