@@ -1,157 +1,262 @@
 <template>
-  <div class="factura-container">
-    <h1>Gesti&oacute;n de Facturas</h1>
+  <div class="container factura-container">
+    <h1 class="text-center mb-4">Generar Facturas</h1>
+
+    <!-- Alertas para mensajes -->
+    <div v-if="mostrarMensajeExito" class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+      {{ mensajeExito }}
+      <button type="button" class="btn-close" @click="mostrarMensajeExito = false" aria-label="Close"></button>
+    </div>
+    
+    <div v-if="mostrarMensajeError" class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+      {{ mensajeError }}
+      <button type="button" class="btn-close" @click="mostrarMensajeError = false" aria-label="Close"></button>
+    </div>
 
     <!-- Cabecera -->
-    <div class="section">
-      <h2>Datos Empresa:</h2>
-      <div class="grid">
-        <div class="form-group">
-          <label>RUC Empresa</label>
-          <input
-            v-model="ruc"
-            type="number"
-            placeholder="Ingrese el RUC"
-            required
-          />
+    <div class="section card p-4 mb-4">
+      <h2 class="mb-3">Datos Empresa:</h2>
+      <div class="row g-3">
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="form-group text-start">
+            <label class="form-label">RUC Empresa</label>
+            <input
+              v-model="ruc"
+              type="text"
+              class="form-control"
+              placeholder="Ingrese el RUC (13 dígitos)"
+              maxlength="13"
+              pattern="[0-9]{13}"
+              @input="validarRuc"
+              :class="{'is-invalid': errorRuc && ruc.length > 0}"
+              required
+            />
+            <div v-if="errorRuc" class="invalid-feedback">
+              El RUC debe contener exactamente 13 dígitos numéricos
+            </div>
+          </div>
         </div>
-        <div class="form-group">
-          <label>N&uacute;mero de documento</label>
-          <input
-            v-model="numeroDocumento"
-            type="number"
-            placeholder="Ingrese ..."
-            required
-          />
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="form-group text-start">
+            <label class="form-label">N&uacute;mero de documento</label>
+            <input
+              v-model="numeroDocumento"
+              type="text"
+              class="form-control"
+              placeholder="Ingrese ..."
+              required
+            />
+          </div>
         </div>
-        <div class="form-group">
-          <label>Establecimiento</label>
-          <input
-            v-model="establecimiento"
-            type="text"
-            placeholder="Ej: "
-            required
-          />
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="form-group text-start">
+            <label class="form-label">Establecimiento</label>
+            <input
+              v-model="establecimiento"
+              type="text"
+              class="form-control"
+              placeholder="Ej: Calle principal y Secundaria"
+              required
+            />
+          </div>
         </div>
-        <div class="form-group">
-          <label>Punto de Emisi&oacute;n</label>
-          <input
-            v-model="puntoEmision"
-            type="text"
-            placeholder="Ej: "
-            required
-          />
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="form-group text-start">
+            <label class="form-label">Punto de Emisi&oacute;n</label>
+            <input
+              v-model="puntoEmision"
+              type="text"
+              class="form-control"
+              placeholder="Ej: Sucursal"
+              required
+            />
+          </div>
         </div>
-        <div class="form-group">
-          <label>Fecha de Emisi&oacute;n</label>
-          <input type="date" v-model="fechaActual" readonly />
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="form-group text-start">
+            <label class="form-label">Fecha de Emisi&oacute;n</label>
+            <input
+              type="date"
+              class="form-control"
+              v-model="fechaActual"
+              readonly
+            />
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Cliente -->
-    <div class="section">
-      <h2>Detalles del cliente:</h2>
-      <div class="grid">
-        <div class="form-group">
-          <label>Identificaci&oacute;n</label>
-          <div class="input-boton-inline">
-            <input
-              v-model="clienteCedula"
-              class="input_busqueda"
-              type="number"
-              placeholder="Ingrese su c&eacute;dula"
-              required
-            />
-            <button @click="consultarCliente(clienteCedula)">Buscar</button>
+    <div class="section card p-4 mb-4">
+      <h2 class="mb-3">Detalles del cliente:</h2>
+      <div class="row g-3">
+        <div class="col-12 col-md-6 col-lg-3">
+          <div class="form-group text-start">
+            <label class="form-label">Identificaci&oacute;n</label>
+            <div class="input-group">
+              <input
+                v-model="clienteCedula"
+                class="form-control"
+                type="text"
+                placeholder="Ingrese su c&eacute;dula (10 dígitos)"
+                maxlength="10"
+                pattern="[0-9]{10}"
+                @input="validarCedula"
+                :class="{'is-invalid': errorCedula && clienteCedula?.length > 0}"
+                required
+              />
+              <button
+                class="btn btn-primary"
+                @click="consultarCliente(clienteCedula)"
+                :disabled="errorCedula || !clienteCedula || clienteCedula.length !== 10"
+              >
+                Buscar
+              </button>
+            </div>
+            <div v-if="errorCedula" class="text-danger small mt-1 d-block">
+              La cédula debe contener exactamente 10 dígitos numéricos
+            </div>
+            <span v-if="mensajeCliente" class="text-danger small mt-1 d-block"
+              >Cliente inexistente</span
+            >
           </div>
-          <span v-if="mensajeCliente" class="mensaje-error"
-            >Cliente inexistente</span
-          >
         </div>
-        <div class="form-group">
-          <label>Nombre</label>
-          <input
-            :value="cliente.nombre"
-            type="text"
-            placeholder="Ingrese su nombre"
-            readonly
-          />
+        <div class="col-12 col-md-6 col-lg-3">
+          <div class="form-group text-start">
+            <label class="form-label">Nombre</label>
+            <input
+              :value="cliente.nombre"
+              type="text"
+              class="form-control"
+              placeholder="Ingrese su nombre"
+              readonly
+            />
+          </div>
         </div>
-        <div class="form-group">
-          <label>Direcci&oacute;n</label>
-          <input
-            :value="cliente.direccion"
-            type="text"
-            placeholder="Ingrese su direcci&oacute;n"
-            readonly
-          />
+        <div class="col-12 col-md-6 col-lg-3">
+          <div class="form-group text-start">
+            <label class="form-label">Direcci&oacute;n</label>
+            <input
+              :value="cliente.direccion"
+              type="text"
+              class="form-control"
+              placeholder="Ingrese su direcci&oacute;n"
+              readonly
+            />
+          </div>
         </div>
-        <div class="form-group">
-          <label>Correo Electr&oacute;nico</label>
-          <input
-            :value="cliente.email"
-            type="email"
-            placeholder="Ej: micorreo@gmail.com"
-            readonly
-          />
+        <div class="col-12 col-md-6 col-lg-3">
+          <div class="form-group  text-start">
+            <label class="form-label">Correo Electr&oacute;nico</label>
+            <input
+              :value="cliente.email"
+              type="email"
+              class="form-control"
+              placeholder="Ej: micorreo@gmail.com"
+              readonly
+            />
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Detalles de la orden -->
-    <div class="section">
-      <h2>Detalles de la orden:</h2>
-      <div class="grid grid-4">
-        <div class="form-group">
-          <label for="prod_cod_bar">C&oacute;digo de barras</label>
-          <div class="input-boton-inline">
+    <div class="section card p-4 mb-4">
+      <h2 class="mb-3">Detalles de la orden:</h2>
+      <div class="row g-3">
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="form-group text-start">
+            <label for="prod_cod_bar" class="form-label"
+              >C&oacute;digo de barras</label
+            >
+            <div class="input-group">
+              <input
+                v-model="codigoBarraProducto"
+                id="prod_cod_bar"
+                type="text"
+                class="form-control"
+                placeholder="Ej: 123456"
+                @input="validarCodigoBarras"
+                :class="{'is-invalid': errorCodigoBarras}"
+                required
+              />
+              <button
+                class="btn btn-primary"
+                @click="consultarProducto(codigoBarraProducto)"
+                :disabled="errorCodigoBarras || !codigoBarraProducto"
+              >
+                Buscar
+              </button>
+            </div>
+            <div v-if="errorCodigoBarras" class="text-danger small mt-1 d-block">
+              El código de barras no puede estar vacío
+            </div>
+            <span v-if="mensajeProducto" class="text-danger small mt-1 d-block"
+              >Producto inexistente</span
+            >
+          </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="form-group text-start">
+            <label class="form-label">Nombre del producto</label>
             <input
-              v-model="codigoBarraProducto"
-              id="prod_cod_bar"
+              :value="producto.nombre"
+              type="text"
+              class="form-control"
+              readonly
+            />
+          </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="form-group text-start">
+            <label class="form-label">Cantidad</label>
+            <input
+              v-model.number="cantidad"
               type="number"
-              placeholder="Ej: 123456"
-              class="input_busqueda"
+              class="form-control"
+              min="1"
+              placeholder="1 - 999"
               required
             />
-            <button @click="consultarProducto(codigoBarraProducto)">
-              Buscar
-            </button>
+            <span v-if="mensajeStock" class="text-danger small mt-1 d-block"
+              >Stock insuficiente</span
+            >
           </div>
-          <span v-if="mensajeProducto" class="mensaje-error"
-            >Producto inexistente</span
-          >
         </div>
-        <div class="form-group">
-          <label>Nombre del producto</label>
-          <input :value="producto.nombre" type="text" readonly />
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="form-group text-start">
+            <label class="form-label">Precio</label>
+            <input
+              :value="precio"
+              type="text"
+              class="form-control"
+              placeholder="$0.00"
+              readonly
+            />
+          </div>
         </div>
-        <div class="form-group">
-          <label>Cantidad</label>
-          <input
-            v-model.number="cantidad"
-            type="number"
-            min="1"
-            placeholder="1 - 999"
-            required
-          />
-          <span v-if="mensajeStock" class="mensaje-error"
-            >Stock insuficiente</span
-          >
-        </div>
-        <div class="form-group">
-          <label>Precio</label>
-          <input :value="precio" type="text" placeholder="$0.00" readonly />
-        </div>
-        <div class="form-group">
-          <label>Subtotal</label>
-          <input :value="subtotal" type="number" placeholder="$0.00" readonly />
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="form-group text-start">
+            <label class="form-label">Subtotal</label>
+            <input
+              :value="subtotal"
+              type="number"
+              class="form-control"
+              placeholder="$0.00"
+              readonly
+            />
+          </div>
         </div>
       </div>
-      <button class="boton-agregar" @click="agregarItem">Agregar</button>
-      <div>
-        <table>
-          <thead>
+      <button
+        class="btn btn-success mt-4 mb-4 mx-auto d-block"
+        @click="agregarItem"
+      >
+        Agregar
+      </button>
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-light">
             <tr>
               <th>C&oacute;digo</th>
               <th>Nombre</th>
@@ -163,21 +268,21 @@
           </thead>
           <tbody>
             <tr v-if="items.length === 0">
-              <td
-                :colspan="6"
-                style="text-align: center; color: #888; font-style: italic"
-              >
+              <td colspan="6" class="text-center text-muted fst-italic">
                 No hay productos agregados a la factura.
               </td>
             </tr>
             <tr v-for="(item, idx) in items" :key="idx">
-              <td data-label="Código">{{ item.codigo }}</td>
-              <td data-label="Nombre">{{ item.nombre }}</td>
-              <td data-label="Cantidad">{{ item.cantidad }}</td>
-              <td data-label="Precio">{{ item.precio }}</td>
-              <td data-label="Subtotal">{{ item.subtotal }}</td>
-              <td data-label="Opciones">
-                <button class="delete-btn" @click="eliminarItem(idx)">
+              <td>{{ item.codigo }}</td>
+              <td>{{ item.nombre }}</td>
+              <td>{{ item.cantidad }}</td>
+              <td>{{ item.precio }}</td>
+              <td>{{ item.subtotal }}</td>
+              <td>
+                <button
+                  class="btn btn-danger btn-sm"
+                  @click="eliminarItem(idx)"
+                >
                   Eliminar
                 </button>
               </td>
@@ -188,25 +293,32 @@
     </div>
 
     <!-- Totales -->
-    <div class="section">
-      <div class="totals">
-        <p>
-          <span>Subtotal: $</span>
-          <span>{{ subtotalGeneral }}</span>
-        </p>
-        <p>
-          <span>Total Impuestos: $</span>
-          <span>{{ totalImpuestos.toFixed(2) }}</span>
-        </p>
-        <hr class="totals-divider" />
-        <p class="total">
-          <span>TOTAL: $</span>
-          <span class="total-bold">{{ totalFactura.toFixed(2) }}</span>
-        </p>
+    <div class="section card p-4 mb-4">
+      <div class="row">
+        <div class="col-12 col-md-6 ms-auto">
+          <div class="totals">
+            <div class="d-flex justify-content-between mb-2">
+              <span>Subtotal:</span>
+              <span>${{ subtotalGeneral }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span>Total Impuestos:</span>
+              <span>${{ totalImpuestos.toFixed(2) }}</span>
+            </div>
+            <hr class="my-3" />
+            <div class="d-flex justify-content-between fw-bold fs-5">
+              <span>TOTAL:</span>
+              <span>${{ totalFactura.toFixed(2) }}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <button class="boton-guardar" @click="guardarFactura">
+    <button
+      class="btn btn-lg btn-primary d-block mx-auto mb-5"
+      @click="guardarFactura"
+    >
       Guardar Factura
     </button>
   </div>
@@ -238,106 +350,152 @@ export default {
       numeroDocumento: "",
       establecimiento: "",
       puntoEmision: "",
+      errorRuc: false,
+      errorCedula: false,
+      errorCodigoBarras: false,
+      mensajeExito: "",
+      mensajeError: "",
+      mostrarMensajeExito: false,
+      mostrarMensajeError: false,
     };
   },
   methods: {
+    validarRuc() {
+      const soloNumeros = /^\d+$/.test(this.ruc);
+      this.errorRuc = !(soloNumeros && this.ruc.length === 13);
+    },
+    validarCedula() {
+      if (!this.clienteCedula) {
+        this.errorCedula = true;
+        return;
+      }
+      const soloNumeros = /^\d+$/.test(this.clienteCedula);
+      this.errorCedula = !(soloNumeros && this.clienteCedula.length === 10);
+      
+      if (!soloNumeros) {
+        this.clienteCedula = this.clienteCedula.replace(/\D/g, '');
+      }
+    },
+    validarCodigoBarras() {
+      this.errorCodigoBarras = !this.codigoBarraProducto || this.codigoBarraProducto.trim() === '';
+    },
     async consultarProducto(codigo) {
+      this.validarCodigoBarras();
+      if (this.errorCodigoBarras) {
+        this.mostrarError("El código de barras no puede estar vacío.");
+        return;
+      }
+      
       try {
         const respuesta = await consultarPorCodigoBarrasFachada(codigo);
         this.producto = respuesta;
         this.precio = respuesta.precio;
         this.productoConsultado = true;
         this.mensajeProducto = false;
+        this.mostrarExito(`Producto "${respuesta.nombre}" encontrado correctamente.`);
       } catch (error) {
         this.mensajeProducto = true;
+        this.mostrarError("No se encontró ningún producto con ese código de barras.");
         setTimeout(() => (this.mensajeProducto = false), 3000);
         this.producto = {};
         this.precio = 0;
       }
     },
     async consultarCliente(cedula) {
+      this.validarCedula();
+      if (this.errorCedula) {
+        this.mostrarError("La cédula ingresada no es válida. Debe contener 10 dígitos numéricos.");
+        return;
+      }
+      
       try {
         const respuesta = await consultarClientePorCedulaFachada(cedula);
         this.cliente = respuesta;
         this.mensajeCliente = false;
+        this.mostrarExito(`Cliente ${respuesta.nombre} encontrado correctamente.`);
       } catch (error) {
         this.mensajeCliente = true;
+        this.mostrarError("No se encontró ningún cliente con esa cédula.");
         setTimeout(() => (this.mensajeCliente = false), 3000);
       }
     },
     async guardarFactura() {
-      // Validación de campos obligatorios
+      this.validarRuc();
+      this.validarCedula();
+      
+      if (this.errorRuc || this.errorCedula) {
+        this.mostrarError("Por favor, corrija los errores de validación antes de continuar.");
+        return;
+      }
+      
       if (
-    !this.ruc ||
-    !this.numeroDocumento ||
-    !this.establecimiento ||
-    !this.puntoEmision ||
-    !this.fechaActual ||
-    !this.clienteCedula ||
-    !this.cliente.nombre ||
-    this.items.length === 0
-  ) {
-    alert(
-      "Por favor, complete todos los campos obligatorios y agregue al menos un producto."
-    );
-    return;
-  }
+        !this.ruc ||
+        !this.numeroDocumento ||
+        !this.establecimiento ||
+        !this.puntoEmision ||
+        !this.fechaActual ||
+        !this.clienteCedula ||
+        !this.cliente.nombre ||
+        this.items.length === 0
+      ) {
+        this.mostrarError("Por favor, complete todos los campos obligatorios y agregue al menos un producto.");
+        return;
+      }
 
-  try {
-    const factura = {
-      rucEmpresa: String(this.ruc),
-      numeroDocumento: String(this.numeroDocumento),
-      establecimiento: String(this.establecimiento),
-      puntoEmision: String(this.puntoEmision),
-      fechaEmision: this.fechaActual,
-      cedulaCliente: String(this.clienteCedula),
-      subtotal: Number(this.subtotalGeneral),
-      totalImpuestos: Number(this.totalImpuestos.toFixed(2)),
-      total: Number(this.totalFactura),
-    };
-    // Guardar factura y obtener el id
-    const facturaGuardada = await guardarFacturaFachada(factura);
-    console.log("Factura guardada:", facturaGuardada);
+      try {
+        const factura = {
+          rucEmpresa: String(this.ruc),
+          numeroDocumento: String(this.numeroDocumento),
+          establecimiento: String(this.establecimiento),
+          puntoEmision: String(this.puntoEmision),
+          fechaEmision: this.fechaActual,
+          cedulaCliente: String(this.clienteCedula),
+          subtotal: Number(this.subtotalGeneral),
+          totalImpuestos: Number(this.totalImpuestos.toFixed(2)),
+          total: Number(this.totalFactura),
+        };
+        const facturaGuardada = await guardarFacturaFachada(factura);
+        console.log("Factura guardada:", facturaGuardada);
 
-    // Prepara el array de detalles
-    const detalles = this.items.map(item => {
-      const totalImpuestosDetalle = (item.impuestos || []).reduce(
-        (sum, imp) => {
-          const porcentaje = imp.valor;
-          return sum + item.subtotal * porcentaje;
-        },
-        0
-      );
-      return {
-        codigoBarras: item.codigo,
-        cantidad: item.cantidad,
-        precio: item.precio,
-        subtotal: item.subtotal,
-        totalImpuestos: totalImpuestosDetalle,
-        facturaId: facturaGuardada,
-      };
-    });
+        const detalles = this.items.map((item) => {
+          const totalImpuestosDetalle = (item.impuestos || []).reduce(
+            (sum, imp) => {
+              const porcentaje = imp.valor;
+              return sum + item.subtotal * porcentaje;
+            },
+            0
+          );
+          return {
+            codigoBarras: item.codigo,
+            cantidad: item.cantidad,
+            precio: item.precio,
+            subtotal: item.subtotal,
+            totalImpuestos: totalImpuestosDetalle,
+            facturaId: facturaGuardada,
+          };
+        });
 
-    // Guarda todos los detalles en lote
-    await guardarDetalleFacturaFachada(detalles);
-    console.log("Detalles guardados:", detalles);
+        await guardarDetalleFacturaFachada(detalles);
+        console.log("Detalles guardados:", detalles);
 
-    // Limpieza de campos
-    this.items = [];
-    this.cliente = {};
-    this.codigoBarraProducto = null;
-    this.clienteCedula = null;
-    this.producto = {};
-    this.cantidad = 0;
-    this.precio = 0;
-    this.ruc = "";
-    this.numeroDocumento = "";
-    this.establecimiento = "";
-    this.puntoEmision = "";
-  } catch (error) {
-    console.error("Error al guardar la factura o detalles:", error);
-  }
-},
+        this.mostrarExito("¡Factura guardada exitosamente!");
+
+        this.items = [];
+        this.cliente = {};
+        this.codigoBarraProducto = null;
+        this.clienteCedula = null;
+        this.producto = {};
+        this.cantidad = 0;
+        this.precio = 0;
+        this.ruc = "";
+        this.numeroDocumento = "";
+        this.establecimiento = "";
+        this.puntoEmision = "";
+      } catch (error) {
+        console.error("Error al guardar la factura o detalles:", error);
+        this.mostrarError("Ocurrió un error al guardar la factura. Por favor, inténtelo nuevamente.");
+      }
+    },
     agregarItem() {
       if (
         this.producto &&
@@ -354,7 +512,9 @@ export default {
           subtotal: this.cantidad * this.precio,
           impuestos: this.producto.impuestos || [],
         });
-        // Limpieza de campos
+        // Mostrar mensaje de éxito
+        this.mostrarExito(`Producto "${this.producto.nombre}" añadido a la factura.`);
+        
         this.codigoBarraProducto = null;
         this.producto = {};
         this.cantidad = 0;
@@ -363,11 +523,34 @@ export default {
         this.mensajeStock = false;
       } else {
         this.mensajeStock = true;
+        if (!this.productoConsultado || Object.keys(this.producto).length === 0) {
+          this.mostrarError("Debe seleccionar un producto válido primero.");
+        } else if (this.cantidad <= 0) {
+          this.mostrarError("La cantidad debe ser mayor a cero.");
+        } else if (this.producto.stock < this.cantidad) {
+          this.mostrarError(`Stock insuficiente. Solo hay ${this.producto.stock} unidades disponibles.`);
+        }
         setTimeout(() => (this.mensajeStock = false), 3000);
       }
     },
     eliminarItem(idx) {
+      const itemEliminado = this.items[idx];
       this.items.splice(idx, 1);
+      this.mostrarExito(`Producto "${itemEliminado.nombre}" eliminado de la factura.`);
+    },
+    mostrarExito(mensaje) {
+      this.mensajeExito = mensaje;
+      this.mostrarMensajeExito = true;
+      setTimeout(() => {
+        this.mostrarMensajeExito = false;
+      }, 3000);
+    },
+    mostrarError(mensaje) {
+      this.mensajeError = mensaje;
+      this.mostrarMensajeError = true;
+      setTimeout(() => {
+        this.mostrarMensajeError = false;
+      }, 3000);
     },
   },
   computed: {
@@ -399,327 +582,89 @@ export default {
     },
   },
   mounted() {
-    // Ajuste para que la zona horaria sea UTC-5
     const now = new Date();
     now.setHours(now.getHours() - 5);
     const yyyy = now.getFullYear();
     const mm = String(now.getMonth() + 1).padStart(2, "0");
     const dd = String(now.getDate()).padStart(2, "0");
     this.fechaActual = `${yyyy}-${mm}-${dd}`;
+    
+    this.errorRuc = false;
+    this.errorCedula = true; 
+    this.errorCodigoBarras = true; 
   },
 };
 </script>
 
 <style scoped>
 .factura-container {
-  max-width: 90vw;
+  max-width: 1200px;
   width: 100%;
   margin: 0 auto;
   padding: 1rem;
   font-family: Arial, sans-serif;
-  box-sizing: border-box;
-}
-
-@media (min-width: 900px) {
-  .factura-container {
-    max-width: 1200px;
-    padding: 2rem;
-  }
 }
 
 h1 {
-  font-size: 1.75rem;
   font-weight: bold;
-  text-align: center;
   margin-bottom: 1.5rem;
 }
 
 .section {
-  background: #e8e8e8;
-  padding: 1.5rem;
+  background: #f8f9fa;
   border-radius: 0.5rem;
-  box-shadow: 0 3px 4px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
   margin-bottom: 1.5rem;
-  width: 100%;
-  box-sizing: border-box;
 }
 
 h2 {
-  font-size: 1.25rem;
   font-weight: 600;
-  margin-bottom: 1rem;
-}
-
-.grid,
-.grid-4 {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
-}
-
-@media (min-width: 600px) {
-  .grid,
-  .grid-4 {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-@media (min-width: 1200px) {
-  .grid,
-  .grid-4 {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-@media (max-width: 599px) {
-  .grid-4 .form-group:last-child {
-    grid-column: 1 / -1;
-  }
-}
-
-@media (max-width: 600px) {
-  .section {
-    padding: 1rem;
-  }
-  .boton-agregar {
-    width: 100%;
-    font-size: clamp(0.9rem, 4vw, 1.1rem);
-    padding: 0.75rem 0;
-  }
 }
 
 .form-group {
-  display: flex;
-  flex-direction: column;
+  margin-bottom: 0.5rem;
 }
 
-label {
-  font-size: 0.875rem;
+.form-label {
   font-weight: 500;
   color: #374151;
-  margin-bottom: 0.25rem;
 }
 
-input {
-  padding: 0.5rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.25rem;
-  font-size: 0.875rem;
-}
-
-input[readonly] {
-  background: #f3f4f6;
-}
-
-.input-boton-inline {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-.input-boton-inline input {
-  flex: 1;
-}
-
-.item-form {
-  margin-bottom: 1rem;
-}
-
-button {
-  padding: 0.5rem 1rem;
-  background: #3b82f6;
-  color: #fff;
-  border: none;
-  border-radius: 0.25rem;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #2563eb;
-}
-
-.delete-btn {
-  background: #ef4444;
-  color: #fff;
-  border: none;
-  border-radius: 0.25rem;
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.delete-btn:hover {
-  background: #b91c1c;
-  color: #fff;
-}
-.boton-agregar {
-  margin-top: 24px;
-  margin-bottom: 24px;
-  padding: 0.75rem 2rem;
-  font-size: clamp(1rem, 2.5vw, 1.5rem);
-  font-weight: bold;
-  background: #22c55e;
-  color: #fff;
-  border: none;
-  border-radius: 0.35rem;
-  cursor: pointer;
-  transition: background 0.2s;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: 80%;
-  min-width: 120px;
-  max-width: 250px;
-}
-
-.boton-agregar:hover {
-  background: #16a34a;
-}
-
-.boton-guardar {
-  margin-top: 24px;
-  margin-bottom: 24px;
-  padding: 0.75rem 2rem;
-  font-size: clamp(1rem, 2.5vw, 1.5rem);
-  font-weight: bold;
-  background: #22c59c;
-  color: #fff;
-  border: none;
-  border-radius: 0.35rem;
-  cursor: pointer;
-  transition: background 0.2s;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: 80%;
-  min-width: 120px;
-  max-width: 250px;
-}
-
-.boton-guardar:hover {
-  background: #1dac88;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: #fff;
-  border-radius: 0.5rem;
-  overflow: hidden;
-  margin-top: 1rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-}
-
-thead {
-  background: #f3f4f6;
-}
-
-th,
-td {
-  padding: 0.75rem 0.5rem;
-  text-align: center;
-  border-bottom: 1px solid #e5e7eb;
-  font-size: 0.95rem;
-}
-
-th {
-  font-weight: 600;
-  color: #374151;
-  letter-spacing: 0.02em;
-  font-style: italic;
-}
-
-tbody tr:last-child td {
-  border-bottom: none;
-}
-
-tbody tr:hover {
-  background: #f1f5f9;
-  transition: background 0.2s;
-}
-
-@media (max-width: 700px) {
-  table,
-  thead,
-  tbody,
-  th,
-  td,
-  tr {
-    display: block;
-  }
-  thead {
-    display: none;
-  }
-  tbody tr {
-    margin-bottom: 1rem;
-    border-radius: 0.5rem;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
-    background: #fff;
-    padding: 0.5rem 0;
-  }
-  td {
-    border: none;
-    position: relative;
-    padding-left: 50%;
-    min-height: 2.5rem;
-    font-size: 1rem;
-    text-align: left;
-  }
-  td:before {
-    position: absolute;
-    left: 1rem;
-    top: 0.75rem;
-    width: 45%;
-    white-space: nowrap;
-    font-weight: bold;
-    color: #64748b;
-    content: attr(data-label);
-  }
+.form-control[readonly] {
+  background-color: #f3f4f6;
 }
 
 .totals {
-  text-align: right;
-  margin-left: auto;
-  margin-right: 0;
   max-width: 350px;
-  margin-top: 2rem;
+  margin-left: auto;
 }
 
-.totals p {
-  display: block;
-  text-align: right;
-  margin-bottom: 0.5rem;
-  font-size: 1rem;
-  font-weight: normal;
-  color: #222;
-}
-
-.totals .total {
+.btn-success {
+  background-color: #22c55e;
+  border-color: #22c55e;
   font-weight: bold;
-  font-size: 1.1rem;
-  text-align: right;
-  margin-top: 0.5rem;
+  max-width: 250px;
+  width: 80%;
 }
 
-.total-bold {
-  font-weight: bold;
-  font-size: 1.2rem;
-  color: #000;
-  text-align: right;
+.btn-success:hover {
+  background-color: #16a34a;
+  border-color: #16a34a;
 }
 
-.totals-divider {
-  border: none;
-  border-top: 2px solid #000000;
-  margin-left: 30%;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
+.btn-primary {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
 }
 
-.mensaje-error {
-  color: #f24e4e;
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
-  text-align: center;
-  font-style: italic;
+.btn-primary:hover {
+  background-color: #2563eb;
+  border-color: #2563eb;
+}
+
+@media (max-width: 767.98px) {
+  .section {
+    padding: 1rem;
+  }
 }
 </style>
