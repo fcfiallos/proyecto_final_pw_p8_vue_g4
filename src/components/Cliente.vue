@@ -15,10 +15,10 @@
 
     <!-- 2. ÁREA DE MENSAJES PARA FEEDBACK AL USUARIO -->
     <div class="container-mensaje">
-      <p v-if="exitoMensaje" class="exitoMensaje">
+      <p v-if="exitoMensaje" id="exitoMensaje">
         <i class="bi bi-check-square"></i> {{ exitoMensaje }}
       </p>
-      <p v-if="errorMensaje" class="errorMensaje">
+      <p v-if="errorMensaje" id="errorMensaje">
         <i class="bi bi-exclamation-square"></i> {{ errorMensaje }}
       </p>
     </div>
@@ -149,6 +149,7 @@
       <button class="boton-eliminar" @click="eliminar">Eliminar</button>
     </div>
   </div>
+
   <div class="container-facturas" v-if="opcionSeleccionada === 'facturas'">
     <!-- Formulario de Búsqueda Centrado -->
     <div class="row justify-content-center">
@@ -311,8 +312,50 @@ export default {
         email: "",
       };
       this.resultadoConsulta = null;
+    },
+    async consultar() {
       this.exitoMensaje = null;
       this.errorMensaje = null;
+      this.limpiarMensajesValidacion();
+
+      if (!this.cliente.cedula) {
+        this.errorMensaje = "La cédula es requerida.";
+        return;
+      }
+      if (!/^[0-9]+$/.test(this.cliente.cedula)) {
+        this.errorMensaje = "La cédula solo debe contener números.";
+        return;
+      }
+      if (this.cliente.cedula.length !== 10) {
+        this.errorMensaje = "La cédula debe tener exactamente 10 dígitos.";
+        return;
+      }
+
+      try {
+        const data = await consultarClientePorCedulaFachada(
+          this.cliente.cedula
+        );
+        this.resultadoConsulta = data;
+
+        if (data) {
+          this.exitoMensaje = `Cliente encontrado: ${data.nombre} ${data.apellido}`;
+
+        } else {
+          this.errorMensaje = "No se encontró ningún cliente con esa cédula.";
+        }
+        setTimeout(() => {
+          this.exitoMensaje = null;
+        this.errorMensaje = null;
+        }, 3000);
+      } catch (error) {
+        this.errorMensaje =
+          "Error al consultar: " +
+          (error.response?.data || "Ocurrió un problema en el servidor.");
+        console.error("Error al consultar cliente:", error);
+        setTimeout(() => {
+          this.errorMensaje = null;
+        }, 3000);
+      }
     },
     limpiarMensajesValidacion() {
       this.mensajesValidacion = {
@@ -325,7 +368,6 @@ export default {
         email: "",
       };
     },
-
     async guardar() {
       this.exitoMensaje = null;
       this.errorMensaje = null;
@@ -336,7 +378,6 @@ export default {
       // Validación para Cédula
       const cedulaStr = String(this.cliente.cedula || "").trim();
       if (cedulaStr === "") {
-        // ¡CORRECCIÓN! Asignamos el error al campo específico.
         this.mensajesValidacion.cedula = "La cédula es obligatoria.";
         hayErrores = true;
       } else if (!/^[0-9]+$/.test(cedulaStr)) {
@@ -399,19 +440,18 @@ export default {
         await guardarClienteFachada(this.cliente);
         this.exitoMensaje = `Cliente '${this.cliente.nombre} ${this.cliente.apellido}' ha sido guardado.`;
 
-        this.cliente = {
-          cedula: "",
-          nombre: "",
-          apellido: "",
-          razonSocial: "",
-          direccion: "",
-          telefono: "",
-          email: "",
-        };
+        this.limpiarTodo();
+        setTimeout(() => {
+          this.exitoMensaje = null;
+        }, 3000);
       } catch (error) {
         this.errorMensaje =
           "Error al guardar: " +
           (error.response?.data || "Ocurrió un problema en el servidor.");
+        console.error("Error al guardar cliente:", error);
+        setTimeout(() => {
+          this.errorMensaje = null;
+        }, 3000);
       }
     },
     async actualizar() {
@@ -421,11 +461,18 @@ export default {
           this.resultadoConsulta
         );
         this.exitoMensaje = `Cliente con cédula ${this.cliente.cedula} ha sido actualizado.`;
-        this.regresarAOpciones();
+        this.limpiarTodo();
+        setTimeout(() => {
+          this.exitoMensaje = null;
+        }, 3000);
       } catch (error) {
         this.errorMensaje =
           "Error: " +
           (error.response?.data || "No se pudo actualizar el cliente.");
+        console.error("Error al actualizar cliente:", error);
+        setTimeout(() => {
+          this.errorMensaje = null;
+        }, 3000);
       }
     },
     async eliminar() {
@@ -433,21 +480,22 @@ export default {
         this.errorMensaje = "La cédula es requerida.";
         return;
       }
-      if (
-        !confirm(
-          `¿Está seguro de eliminar al cliente con cédula ${this.cliente.cedula}?`
-        )
-      )
-        return;
 
       this.limpiarTodo();
       try {
         await eliminarClientePorCedulaFachada(this.cliente.cedula);
         this.exitoMensaje = "Cliente eliminado exitosamente.";
+        setTimeout(() => {
+          this.exitoMensaje = null;
+        }, 3000);
       } catch (error) {
         this.errorMensaje =
           "Error: " +
           (error.response?.data || "No se pudo eliminar el cliente.");
+        console.error("Error al eliminar cliente:", error);
+        setTimeout(() => {
+          this.errorMensaje = null;
+        }, 3000);
       }
     },
     async consultarFacturas() {
@@ -470,13 +518,23 @@ export default {
 
         if (data && data.length > 0) {
           this.exitoMensaje = `Se encontraron ${data.length} facturas para el cliente.`;
+          setTimeout(() => {
+            this.exitoMensaje = null;
+          }, 3000);
         } else {
           this.exitoMensaje = "El cliente no tiene facturas registradas.";
+          setTimeout(() => {
+            this.exitoMensaje = null;
+          }, 3000);
         }
       } catch (error) {
         this.errorMensaje =
           "Error: " +
           (error.response?.data || "No se pudo consultar las facturas.");
+          console.error("Error al consultar facturas:", error);
+          setTimeout(() => {
+            this.errorMensaje = null;
+          }, 3000);
       }
     },
     calcularTotalGeneral() {
