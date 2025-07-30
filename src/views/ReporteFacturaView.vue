@@ -15,6 +15,7 @@ import ReporteFacturas from "@/components/ReporteFacturas.vue";
 </script>
 
 <style scoped>
+@import "@/css/HeaderView.css";
 .reporte-factura {
   padding: 20px;
   margin: 20px auto;
