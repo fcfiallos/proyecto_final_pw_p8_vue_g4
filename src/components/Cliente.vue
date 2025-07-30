@@ -150,43 +150,44 @@
       />
       <button class="boton-eliminar" @click="eliminar">Eliminar</button>
     </div>
-    <div class="container-consultar" v-if="opcionSeleccionada === 'facturas'">
-      <h3>Consultar Facturas por Cédula</h3>
-      <input
-        type="text"
-        v-model="cliente.cedula"
-        placeholder="Ingrese la cédula del cliente"
-        @keyup.enter="consultarFacturas"
-      />
-      <button class="boton" @click="consultarFacturas">Ver Facturas</button>
+  </div>
+  <div class="container-facturas" v-if="opcionSeleccionada === 'facturas'">
+    <h3>Consultar Facturas por Cédula</h3>
+    <input
+      type="text"
+      v-model="cliente.cedula"
+      placeholder="Ingrese la cédula del cliente"
+      @keyup.enter="consultarFacturas"
+    />
+    <button class="boton" @click="consultarFacturas">Ver Facturas</button>
 
-      <!-- Tabla para mostrar los resultados -->
-      <div class="resultado" v-if="listaFacturas.length > 0">
-        <h4>Facturas Encontradas:</h4>
-        <table>
-          <thead>
-            <tr>
-              <th>Número de Documento</th>
-              <th>Fecha de Emisión</th>
-              <th>Cantidad de Ítems</th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="factura in listaFacturas" :key="factura.numeroDocumento">
-              <td>{{ factura.numeroDocumento }}</td>
-              <td>{{ factura.fechaEmision }}</td>
-              <td>{{ factura.cantidadItems }}</td>
-              <td>${{ factura.total }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+    <!-- Tabla para mostrar los resultados -->
+    <div class="resultado" v-if="listaFacturas && listaFacturas.length > 0">
+      <h4>Facturas Encontradas:</h4>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Número de Documento</th>
+            <th>Nombre Cliente</th>
+            <th>Total Impuestos</th>
+            <th>TOTAL</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="factura in listaFacturas" :key="factura.numeroDocumento">
+            <td>{{ factura.numeroDocumento }}</td>
+            <td>{{ factura.nombreCliente }}</td>
+            <td>${{ factura.totalImpuestos.toFixed(2) }}</td>
+            <td>${{ factura.total.toFixed(2) }}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </template>
 
 <script>
+// Importamos los componentes hijos y la fachada del cliente
 import BotonRegresar from "@/components/BotonRegresar.vue";
 import OpcionesSeleccion from "@/components/OpcionesSeleccion.vue";
 import {
@@ -194,8 +195,8 @@ import {
   consultarClientePorCedulaFachada,
   actualizarClienteFachada,
   eliminarClientePorCedulaFachada,
-  obtenerFacturasPorCedulaFachada,
 } from "@/client/ClienteClient";
+import { obtenerReporteFacturasPorCedulaFachada } from "@/client/FacturaClient.js";
 
 export default {
   name: "GestionCliente",
@@ -263,26 +264,7 @@ export default {
     };
   },
   methods: {
-    async consultar() {
-      this.limpiarTodo(); // Limpia mensajes y resultados previos
-      if (!this.cliente.cedula) {
-        this.errorMensaje = "La cédula es requerida.";
-        return;
-      }
-      try {
-        const data = await consultarClientePorCedulaFachada(
-          this.cliente.cedula
-        );
-        this.resultadoConsulta = data;
-        this.exitoMensaje = "Cliente encontrado exitosamente.";
-      } catch (error) {
-        this.errorMensaje =
-          "Error: " +
-          (error.response?.data || "No se pudo consultar el cliente.");
-        this.resultadoConsulta = null;
-      }
-    },
-
+    // Métodos para manejar la UI
     seleccionarOpcion(opcion) {
       this.opcionSeleccionada = opcion;
       this.limpiarTodo();
@@ -295,12 +277,16 @@ export default {
       const cedulaActual = this.cliente.cedula;
       this.cliente = {
         cedula: cedulaActual,
-        // ... (resto de los campos)
+        nombre: "",
+        apellido: "",
+        razonSocial: "",
+        direccion: "",
+        telefono: "",
+        email: "",
       };
       this.resultadoConsulta = null;
       this.exitoMensaje = null;
       this.errorMensaje = null;
-      this.listaFacturas = [];
     },
     limpiarMensajesValidacion() {
       this.mensajesValidacion = {
@@ -313,41 +299,16 @@ export default {
         email: "",
       };
     },
-    async consultarFacturas() {
-      this.limpiarTodo();
-      if (!this.cliente.cedula) {
-        this.errorMensaje = "La cédula es requerida para buscar facturas.";
-        return;
-      }
-      try {
-        console.log("Buscando facturas para la cédula:", this.cliente.cedula);
-        const data = await obtenerFacturasPorCedulaFachada(this.cliente.cedula);
-
-        console.log("Respuesta del API de facturas:", data);
-        console.log("Tipo de dato recibido:", typeof data);
-        console.log("¿Es un array?", Array.isArray(data));
-        console.log("Longitud del array:", data.length);
-
-        this.listaFacturas = data;
-
-        if (data.length > 0) {
-          this.exitoMensaje = `Se encontraron ${data.length} facturas.`;
-        } else {
-          this.exitoMensaje = "El cliente no tiene facturas registradas.";
-        }
-      } catch (error) {
-        this.errorMensaje =
-          "Error: " +
-          (error.response?.data || "No se pudo consultar las facturas.");
-      }
-    },
 
     async guardar() {
+      // 1. Limpiamos todos los mensajes previos
       this.exitoMensaje = null;
-      this.errorMensaje = null;
-      this.limpiarMensajesValidacion();
+      this.errorMensaje = null; // Para errores generales del API
+      this.limpiarMensajesValidacion(); // Para errores de campo
 
-      let hayErrores = false;
+      let hayErrores = false; // Bandera para saber si podemos continuar
+
+      // --- INICIO DEL BLOQUE DE VALIDACIONES (VERSIÓN CORREGIDA) ---
 
       // Validación para Cédula
       const cedulaStr = String(this.cliente.cedula || "").trim();
@@ -464,6 +425,35 @@ export default {
         this.errorMensaje =
           "Error: " +
           (error.response?.data || "No se pudo eliminar el cliente.");
+      }
+    },
+    async consultarFacturas() {
+      // Limpiamos resultados anteriores para evitar confusiones
+      this.exitoMensaje = null;
+      this.errorMensaje = null;
+      this.listaFacturas = [];
+
+      if (!this.cliente.cedula) {
+        this.errorMensaje = "La cédula es requerida para buscar facturas.";
+        return;
+      }
+      try {
+        // Usamos la fachada del reporte de facturas
+        const data = await obtenerReporteFacturasPorCedulaFachada(
+          this.cliente.cedula
+        );
+
+        this.listaFacturas = data;
+
+        if (data && data.length > 0) {
+          this.exitoMensaje = `Se encontraron ${data.length} facturas para el cliente.`;
+        } else {
+          this.exitoMensaje = "El cliente no tiene facturas registradas.";
+        }
+      } catch (error) {
+        this.errorMensaje =
+          "Error: " +
+          (error.response?.data || "No se pudo consultar las facturas.");
       }
     },
   },
