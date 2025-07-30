@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API_BASE_URL = "http://localhost:8081/api/inventario/v1/facturas";
-const API_DETALLE_URL = "http://localhost:8081/api/inventario/v1/detalle";
+const API_DETALLE_URL = "http://localhost:8081/api/inventario/v1/detalle/lote";
 
 const _obtenerReporteFacturas = async () => {
   try {
