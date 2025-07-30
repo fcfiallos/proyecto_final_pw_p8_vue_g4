@@ -3,14 +3,32 @@
     <h1 class="text-center mb-4">Generar Facturas</h1>
 
     <!-- Alertas para mensajes -->
-    <div v-if="mostrarMensajeExito" class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+    <div
+      v-if="mostrarMensajeExito"
+      class="alert alert-success alert-dismissible fade show mb-3"
+      role="alert"
+    >
       {{ mensajeExito }}
-      <button type="button" class="btn-close" @click="mostrarMensajeExito = false" aria-label="Close"></button>
+      <button
+        type="button"
+        class="btn-close"
+        @click="mostrarMensajeExito = false"
+        aria-label="Close"
+      ></button>
     </div>
-    
-    <div v-if="mostrarMensajeError" class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+
+    <div
+      v-if="mostrarMensajeError"
+      class="alert alert-danger alert-dismissible fade show mb-3"
+      role="alert"
+    >
       {{ mensajeError }}
-      <button type="button" class="btn-close" @click="mostrarMensajeError = false" aria-label="Close"></button>
+      <button
+        type="button"
+        class="btn-close"
+        @click="mostrarMensajeError = false"
+        aria-label="Close"
+      ></button>
     </div>
 
     <!-- Cabecera -->
@@ -28,10 +46,12 @@
               maxlength="13"
               pattern="[0-9]{13}"
               @input="validarRuc"
-              :class="{'is-invalid': errorRuc && ruc.length > 0}"
+              :class="{
+                'is-invalid': mostrarErrorRuc && errorRuc && ruc.length > 0,
+              }"
               required
             />
-            <div v-if="errorRuc" class="invalid-feedback">
+            <div v-if="mostrarErrorRuc && errorRuc" class="invalid-feedback">
               El RUC debe contener exactamente 13 dígitos numéricos
             </div>
           </div>
@@ -102,18 +122,28 @@
                 maxlength="10"
                 pattern="[0-9]{10}"
                 @input="validarCedula"
-                :class="{'is-invalid': errorCedula && clienteCedula?.length > 0}"
+                :class="{
+                  'is-invalid':
+                    mostrarErrorCedula &&
+                    errorCedula &&
+                    clienteCedula?.length > 0,
+                }"
                 required
               />
               <button
                 class="btn btn-primary"
                 @click="consultarCliente(clienteCedula)"
-                :disabled="errorCedula || !clienteCedula || clienteCedula.length !== 10"
+                :disabled="
+                  errorCedula || !clienteCedula || clienteCedula.length !== 10
+                "
               >
                 Buscar
               </button>
             </div>
-            <div v-if="errorCedula" class="text-danger small mt-1 d-block">
+            <div
+              v-if="mostrarErrorCedula && errorCedula"
+              class="text-danger small mt-1 d-block"
+            >
               La cédula debe contener exactamente 10 dígitos numéricos
             </div>
             <span v-if="mensajeCliente" class="text-danger small mt-1 d-block"
@@ -146,7 +176,7 @@
           </div>
         </div>
         <div class="col-12 col-md-6 col-lg-3">
-          <div class="form-group  text-start">
+          <div class="form-group text-start">
             <label class="form-label">Correo Electr&oacute;nico</label>
             <input
               :value="cliente.email"
@@ -177,7 +207,9 @@
                 class="form-control"
                 placeholder="Ej: 123456"
                 @input="validarCodigoBarras"
-                :class="{'is-invalid': errorCodigoBarras}"
+                :class="{
+                  'is-invalid': mostrarErrorCodigoBarras && errorCodigoBarras,
+                }"
                 required
               />
               <button
@@ -188,7 +220,10 @@
                 Buscar
               </button>
             </div>
-            <div v-if="errorCodigoBarras" class="text-danger small mt-1 d-block">
+            <div
+              v-if="mostrarErrorCodigoBarras && errorCodigoBarras"
+              class="text-danger small mt-1 d-block"
+            >
               El código de barras no puede estar vacío
             </div>
             <span v-if="mensajeProducto" class="text-danger small mt-1 d-block"
@@ -353,6 +388,9 @@ export default {
       errorRuc: false,
       errorCedula: false,
       errorCodigoBarras: false,
+      mostrarErrorRuc: false,
+      mostrarErrorCedula: false,
+      mostrarErrorCodigoBarras: false,
       mensajeExito: "",
       mensajeError: "",
       mostrarMensajeExito: false,
@@ -371,31 +409,41 @@ export default {
       }
       const soloNumeros = /^\d+$/.test(this.clienteCedula);
       this.errorCedula = !(soloNumeros && this.clienteCedula.length === 10);
-      
+
       if (!soloNumeros) {
-        this.clienteCedula = this.clienteCedula.replace(/\D/g, '');
+        this.clienteCedula = this.clienteCedula.replace(/\D/g, "");
       }
     },
     validarCodigoBarras() {
-      this.errorCodigoBarras = !this.codigoBarraProducto || this.codigoBarraProducto.trim() === '';
+      this.errorCodigoBarras =
+        !this.codigoBarraProducto || this.codigoBarraProducto.trim() === "";
     },
     async consultarProducto(codigo) {
       this.validarCodigoBarras();
+      this.mostrarErrorCodigoBarras = true;
+
       if (this.errorCodigoBarras) {
         this.mostrarError("El código de barras no puede estar vacío.");
         return;
       }
-      
+
       try {
         const respuesta = await consultarPorCodigoBarrasFachada(codigo);
         this.producto = respuesta;
         this.precio = respuesta.precio;
         this.productoConsultado = true;
         this.mensajeProducto = false;
-        this.mostrarExito(`Producto "${respuesta.nombre}" encontrado correctamente.`);
+        this.mostrarExito(
+          `Producto "${respuesta.nombre}" encontrado correctamente.`
+        );
+        setTimeout(() => {
+          this.mostrarExito(null);
+        }, 3000);
       } catch (error) {
         this.mensajeProducto = true;
-        this.mostrarError("No se encontró ningún producto con ese código de barras.");
+        this.mostrarError(
+          "No se encontró ningún producto con ese código de barras."
+        );
         setTimeout(() => (this.mensajeProducto = false), 3000);
         this.producto = {};
         this.precio = 0;
@@ -403,16 +451,22 @@ export default {
     },
     async consultarCliente(cedula) {
       this.validarCedula();
+      this.mostrarErrorCedula = true;
+
       if (this.errorCedula) {
-        this.mostrarError("La cédula ingresada no es válida. Debe contener 10 dígitos numéricos.");
+        this.mostrarError(
+          "La cédula ingresada no es válida. Debe contener 10 dígitos numéricos."
+        );
         return;
       }
-      
+
       try {
         const respuesta = await consultarClientePorCedulaFachada(cedula);
         this.cliente = respuesta;
         this.mensajeCliente = false;
-        this.mostrarExito(`Cliente ${respuesta.nombre} encontrado correctamente.`);
+        this.mostrarExito(
+          `Cliente ${respuesta.nombre} encontrado correctamente.`
+        );
       } catch (error) {
         this.mensajeCliente = true;
         this.mostrarError("No se encontró ningún cliente con esa cédula.");
@@ -422,12 +476,16 @@ export default {
     async guardarFactura() {
       this.validarRuc();
       this.validarCedula();
-      
+      this.mostrarErrorRuc = true;
+      this.mostrarErrorCedula = true;
+
       if (this.errorRuc || this.errorCedula) {
-        this.mostrarError("Por favor, corrija los errores de validación antes de continuar.");
+        this.mostrarError(
+          "Por favor, corrija los errores de validación antes de continuar."
+        );
         return;
       }
-      
+
       if (
         !this.ruc ||
         !this.numeroDocumento ||
@@ -438,7 +496,9 @@ export default {
         !this.cliente.nombre ||
         this.items.length === 0
       ) {
-        this.mostrarError("Por favor, complete todos los campos obligatorios y agregue al menos un producto.");
+        this.mostrarError(
+          "Por favor, complete todos los campos obligatorios y agregue al menos un producto."
+        );
         return;
       }
 
@@ -491,9 +551,16 @@ export default {
         this.numeroDocumento = "";
         this.establecimiento = "";
         this.puntoEmision = "";
+
+        // Reset error displays
+        this.mostrarErrorRuc = false;
+        this.mostrarErrorCedula = false;
+        this.mostrarErrorCodigoBarras = false;
       } catch (error) {
         console.error("Error al guardar la factura o detalles:", error);
-        this.mostrarError("Ocurrió un error al guardar la factura. Por favor, inténtelo nuevamente.");
+        this.mostrarError(
+          "Ocurrió un error al guardar la factura. Por favor, inténtelo nuevamente."
+        );
       }
     },
     agregarItem() {
@@ -513,22 +580,30 @@ export default {
           impuestos: this.producto.impuestos || [],
         });
         // Mostrar mensaje de éxito
-        this.mostrarExito(`Producto "${this.producto.nombre}" añadido a la factura.`);
-        
+        this.mostrarExito(
+          `Producto "${this.producto.nombre}" añadido a la factura.`
+        );
+
         this.codigoBarraProducto = null;
         this.producto = {};
         this.cantidad = 0;
         this.precio = 0;
         this.productoConsultado = false;
         this.mensajeStock = false;
+        this.mostrarErrorCodigoBarras = false;
       } else {
         this.mensajeStock = true;
-        if (!this.productoConsultado || Object.keys(this.producto).length === 0) {
+        if (
+          !this.productoConsultado ||
+          Object.keys(this.producto).length === 0
+        ) {
           this.mostrarError("Debe seleccionar un producto válido primero.");
         } else if (this.cantidad <= 0) {
           this.mostrarError("La cantidad debe ser mayor a cero.");
         } else if (this.producto.stock < this.cantidad) {
-          this.mostrarError(`Stock insuficiente. Solo hay ${this.producto.stock} unidades disponibles.`);
+          this.mostrarError(
+            `Stock insuficiente. Solo hay ${this.producto.stock} unidades disponibles.`
+          );
         }
         setTimeout(() => (this.mensajeStock = false), 3000);
       }
@@ -536,11 +611,16 @@ export default {
     eliminarItem(idx) {
       const itemEliminado = this.items[idx];
       this.items.splice(idx, 1);
-      this.mostrarExito(`Producto "${itemEliminado.nombre}" eliminado de la factura.`);
+      this.mostrarExito(
+        `Producto "${itemEliminado.nombre}" eliminado de la factura.`
+      );
     },
     mostrarExito(mensaje) {
       this.mensajeExito = mensaje;
       this.mostrarMensajeExito = true;
+      this.$nextTick(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
       setTimeout(() => {
         this.mostrarMensajeExito = false;
       }, 3000);
@@ -548,6 +628,9 @@ export default {
     mostrarError(mensaje) {
       this.mensajeError = mensaje;
       this.mostrarMensajeError = true;
+      this.$nextTick(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
       setTimeout(() => {
         this.mostrarMensajeError = false;
       }, 3000);
@@ -588,10 +671,15 @@ export default {
     const mm = String(now.getMonth() + 1).padStart(2, "0");
     const dd = String(now.getDate()).padStart(2, "0");
     this.fechaActual = `${yyyy}-${mm}-${dd}`;
-    
+
     this.errorRuc = false;
-    this.errorCedula = true; 
-    this.errorCodigoBarras = true; 
+    this.errorCedula = true;
+    this.errorCodigoBarras = true;
+
+    // Inicializar variables para ocultar los mensajes de error al inicio
+    this.mostrarErrorRuc = false;
+    this.mostrarErrorCedula = false;
+    this.mostrarErrorCodigoBarras = false;
   },
 };
 </script>

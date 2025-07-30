@@ -2,7 +2,9 @@
   <div class="container-bodega">
     <div class="header-container">
       <BotonRegresar :accion="regresarAOpciones" v-if="opcionSeleccionada" />
-      <h2 v-if="!opcionSeleccionada">¿Qué acción deseas realizar con las bodegas?</h2>
+      <h2 v-if="!opcionSeleccionada">
+        ¿Qué acción deseas realizar con las bodegas?
+      </h2>
     </div>
     <OpcionesSeleccion
       :cartas="cartas"
@@ -37,7 +39,12 @@
       <p>Es necesario llenar todos los campos para guardar la bodega.</p>
       <div class="formulario">
         <label for="codigo">C&oacute;digo</label>
-        <input type="text" v-model="codigo" id="codigo" placeholder="Código de bodega"/>
+        <input
+          type="text"
+          v-model="codigo"
+          id="codigo"
+          placeholder="Código de bodega"
+        />
         <span v-if="mensaje.codigoMensaje"
           ><i class="bi bi-exclamation-circle"></i>
           {{ mensaje.codigoMensaje }}</span
@@ -200,23 +207,53 @@ export default {
         this.limpiarMensajes();
         if (!this.codigo) {
           this.mensaje.codigoMensaje = "El código es obligatorio";
+          this.$nextTick(() => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          });
           setTimeout(() => {
             this.mensaje.codigoMensaje = "";
           }, 3000);
           return;
         }
+        if (this.codigo.trim() === "") {
+          this.mensaje.codigoMensaje = "El código no puede estar vacío";
+          this.$nextTick(() => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          });
+          setTimeout(() => {
+            this.mensaje.codigoMensaje = "";
+          }, 3000);
+          return;
+        }
+
         const response = await consultarPorCodigoFachada(this.codigo);
+        if (!response) {
+          this.errorMensaje = "No se encontró ninguna bodega con ese código.";
+          this.resultado = false;
+          this.$nextTick(() => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          });
+          setTimeout(() => {
+            this.errorMensaje = null;
+          }, 3000);
+          return;
+        }
         this.nombre = response.nombre;
         this.ubicacion = response.ubicacion;
         this.exitoMensaje = "Consulta exitosa";
         this.resultado = true;
+        this.$nextTick(() => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
         setTimeout(() => {
           this.exitoMensaje = null;
         }, 3000);
-      
       } catch (error) {
         this.errorMensaje = "Error al consultar la bodega";
         this.resultado = false;
+        this.$nextTick(() => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
         setTimeout(() => {
           this.errorMensaje = null;
         }, 3000);
@@ -260,14 +297,31 @@ export default {
           codigo: this.codigo.trim(),
           ubicacion: this.ubicacion.trim(),
         };
+
+        if (await consultarPorCodigoFachada(bodega.codigo)) {
+          this.errorMensaje = "Ya existe una bodega con ese código";
+          this.$nextTick(() => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          });
+          setTimeout(() => {
+            this.errorMensaje = null;
+          }, 3000);
+          return;
+        }
         await guardarFachada(bodega);
         this.exitoMensaje = "Bodega guardada exitosamente";
+        this.$nextTick(() => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
         setTimeout(() => {
           this.exitoMensaje = null;
         }, 3000);
         this.limpiarFormularios();
       } catch (error) {
         this.errorMensaje = "Error al guardar la bodega";
+        this.$nextTick(() => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
         setTimeout(() => {
           this.errorMensaje = null;
         }, 3000);
@@ -281,9 +335,6 @@ export default {
         // Validar que al menos tengamos el código (necesario para identificar la bodega)
         if (!this.codigo || this.codigo.trim() === "") {
           this.mensaje.codigoMensaje = "El código es obligatorio";
-          setTimeout(() => {
-            this.mensaje.codigoMensaje = "";
-          }, 3000);
           return;
         }
 
@@ -310,12 +361,18 @@ export default {
 
         await actualizarFachada(bodegaActualizada, this.codigo.trim());
         this.exitoMensaje = "Bodega actualizada exitosamente";
+        this.$nextTick(() => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
         setTimeout(() => {
           this.exitoMensaje = null;
         }, 3000);
         this.limpiarFormularios();
       } catch (error) {
         this.errorMensaje = "Error al actualizar la bodega";
+        this.$nextTick(() => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
         setTimeout(() => {
           this.errorMensaje = null;
         }, 3000);
@@ -326,19 +383,22 @@ export default {
         this.limpiarMensajes();
         if (!this.codigo || this.codigo.trim() === "") {
           this.mensaje.codigoMensaje = "El código es obligatorio";
-          setTimeout(() => {
-            this.mensaje.codigoMensaje = "";
-          }, 3000);
           return;
         }
         await eliminarFachada(this.codigo.trim());
         this.exitoMensaje = "Bodega eliminada exitosamente";
+        this.$nextTick(() => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
         setTimeout(() => {
           this.exitoMensaje = null;
         }, 3000);
         this.limpiarFormularios();
       } catch (error) {
         this.errorMensaje = "Error al eliminar la bodega";
+        this.$nextTick(() => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
         setTimeout(() => {
           this.errorMensaje = null;
         }, 3000);

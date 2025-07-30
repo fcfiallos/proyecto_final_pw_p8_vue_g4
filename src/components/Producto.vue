@@ -307,12 +307,12 @@ export default {
       precio: null,
       stock: null,
       categoria: null,
-      bodegaId: null, 
-      bodegaNombre: null, 
-      bodegasDisponibles: [], 
-      cargandoBodegas: false, 
-      impuestosSeleccionados: [], 
-      impuestosDisponibles: [], 
+      bodegaId: null,
+      bodegaNombre: null,
+      bodegasDisponibles: [],
+      cargandoBodegas: false,
+      impuestosSeleccionados: [],
+      impuestosDisponibles: [],
       errorMensaje: null,
       exitoMensaje: null,
       mensaje: {
@@ -399,6 +399,17 @@ export default {
         const response = await consultarPorCodigoBarrasFachada(
           this.codigoBarras
         );
+        if (!response) {
+          this.errorMensaje = "Producto no encontrado";
+          this.resultado = false;
+          this.$nextTick(() => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          });
+          setTimeout(() => {
+            this.errorMensaje = null;
+          }, 3000);
+          return;
+        }
         this.nombre = response.nombre;
         this.precio = response.precio;
         this.stock = response.stock;
@@ -411,17 +422,21 @@ export default {
           ? `${response.bodega.nombre} - ${response.bodega.ubicacion}`
           : null;
 
-      
         this.impuestosSeleccionados = response.impuestos
           ? response.impuestos.map((imp) => imp.id)
           : [];
 
-     
         this.impuestosDisponibles = response.impuestos || [];
 
         this.exitoMensaje = "Consulta exitosa";
         this.resultado = true;
-       
+        this.$nextTick(() => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+        setTimeout(() => {
+          this.limpiarFormularios();
+          this.resultado = false;
+        }, 3000);
       } catch (error) {
         this.errorMensaje = "Error al consultar el producto";
         this.resultado = false;
@@ -432,7 +447,6 @@ export default {
         this.limpiarMensajes();
         let hayErrores = false;
 
-        
         this.obtenerImpuestosDisponibles();
 
         // Validar todos los campos obligatorios
@@ -487,10 +501,8 @@ export default {
 
         console.log("Bodega seleccionada:", bodegaSeleccionada);
 
-       
         let bodegaObj = {};
         if (bodegaSeleccionada) {
-       
           if (bodegaSeleccionada.id) {
             bodegaObj.id = bodegaSeleccionada.id;
           }
@@ -519,13 +531,22 @@ export default {
         console.log("========================");
         await guardarFachada(producto);
         this.exitoMensaje = "Producto guardado exitosamente";
-       
+        this.$nextTick(() => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
         setTimeout(() => {
           this.limpiarFormularios();
+          this.exitoMensaje = null;
         }, 3500);
       } catch (error) {
         this.errorMensaje = "Error al guardar el producto";
         console.error("Error al guardar el producto:", error);
+        this.$nextTick(() => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+        setTimeout(() => {
+          this.errorMensaje = null;
+        }, 3000);
       }
     },
     async actualizar() {
@@ -560,12 +581,10 @@ export default {
           hayErrores = true;
         }
 
-  
         if (hayErrores) {
           return;
         }
 
-   
         let productoActual;
         try {
           productoActual = await consultarPorCodigoBarrasFachada(
@@ -588,10 +607,8 @@ export default {
 
         console.log("Bodega seleccionada para actualizar:", bodegaSeleccionada);
 
-      
         let bodegaObj = {};
         if (bodegaSeleccionada) {
-     
           if (bodegaSeleccionada.id) {
             bodegaObj.id = bodegaSeleccionada.id;
           }
@@ -599,13 +616,11 @@ export default {
             bodegaObj.codigo = bodegaSeleccionada.codigo;
           }
         } else {
-        
           bodegaObj.id = this.bodegaId;
         }
 
         const camposActualizados = {};
 
-      
         if (this.nombre.trim() !== productoActual.nombre) {
           camposActualizados.nombre = this.nombre.trim();
         }
@@ -626,7 +641,6 @@ export default {
           camposActualizados.stock = stockNuevo;
         }
 
-  
         const bodegaActualId =
           productoActual.bodega?.id || productoActual.bodega?.codigo;
         const bodegaNuevaId = bodegaObj.id || bodegaObj.codigo;
@@ -635,7 +649,6 @@ export default {
           camposActualizados.bodega = bodegaObj;
         }
 
-  
         const impuestosActuales =
           productoActual.impuestos?.map((imp) => imp.id) || [];
         const impuestosSeleccionadosOrdenados = [
@@ -643,7 +656,6 @@ export default {
         ].sort();
         const impuestosActualesOrdenados = [...impuestosActuales].sort();
 
-       
         const impuestosIguales =
           impuestosActualesOrdenados.length ===
             impuestosSeleccionadosOrdenados.length &&
@@ -671,13 +683,22 @@ export default {
 
         await actualizarFachada(camposActualizados, this.codigoBarras.trim());
         this.exitoMensaje = "Producto actualizado exitosamente";
-       
+        this.$nextTick(() => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
         setTimeout(() => {
           this.limpiarFormularios();
+          this.exitoMensaje = null;
         }, 3500);
       } catch (error) {
         console.error("Error completo:", error);
         this.errorMensaje = "Error al actualizar el producto";
+        this.$nextTick(() => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+        setTimeout(() => {
+          this.errorMensaje = null;
+        }, 3000);
       }
     },
     async eliminar() {
@@ -690,15 +711,26 @@ export default {
         }
         await eliminarFachada(this.codigoBarras.trim());
         this.exitoMensaje = "Producto eliminado exitosamente";
+        this.$nextTick(() => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
         this.limpiarFormularios();
+        setTimeout(() => {
+          this.exitoMensaje = null;
+        }, 3500);
       } catch (error) {
         this.errorMensaje = "Error al eliminar el producto";
+        this.$nextTick(() => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
         console.error("Error al eliminar el producto:", error);
+        setTimeout(() => {
+          this.errorMensaje = null;
+        }, 3000);
       }
     },
- 
+
     obtenerNombreImpuesto(impuestoId) {
-   
       if (this.impuestosDisponibles && this.impuestosDisponibles.length > 0) {
         const impuesto = this.impuestosDisponibles.find(
           (imp) => imp.id === impuestoId
@@ -708,7 +740,6 @@ export default {
         }
       }
 
-   
       let generadorRef = null;
       if (this.$refs.generadorImpuesto) {
         generadorRef = this.$refs.generadorImpuesto;
@@ -727,13 +758,10 @@ export default {
         }
       }
 
-      
       return `Impuesto ID: ${impuestoId}`;
     },
 
-
     obtenerImpuestosDisponibles() {
-
       let generadorRef = null;
 
       if (
@@ -759,7 +787,7 @@ export default {
         );
       } else {
         console.warn("No se pudo acceder al método getImpuestosDisponibles");
-      
+
         this.impuestosDisponibles = [];
       }
     },

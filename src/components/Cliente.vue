@@ -339,19 +339,31 @@ export default {
 
         if (data) {
           this.exitoMensaje = `Cliente encontrado: ${data.nombre} ${data.apellido}`;
-
+          this.$nextTick(() => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          });
+          setTimeout(() => {
+            this.exitoMensaje = null;
+          }, 3000);
         } else {
           this.errorMensaje = "No se encontró ningún cliente con esa cédula.";
+          this.resultadoConsulta = null;
+          this.$nextTick(() => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          });
+          setTimeout(() => {
+            this.errorMensaje = null;
+          }, 3000);
+          return;
         }
-        setTimeout(() => {
-          this.exitoMensaje = null;
-        this.errorMensaje = null;
-        }, 3000);
       } catch (error) {
         this.errorMensaje =
           "Error al consultar: " +
           (error.response?.data || "Ocurrió un problema en el servidor.");
         console.error("Error al consultar cliente:", error);
+        this.$nextTick(() => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
         setTimeout(() => {
           this.errorMensaje = null;
         }, 3000);
@@ -439,7 +451,9 @@ export default {
       try {
         await guardarClienteFachada(this.cliente);
         this.exitoMensaje = `Cliente '${this.cliente.nombre} ${this.cliente.apellido}' ha sido guardado.`;
-
+        this.$nextTick(() => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
         this.limpiarTodo();
         setTimeout(() => {
           this.exitoMensaje = null;
@@ -449,6 +463,9 @@ export default {
           "Error al guardar: " +
           (error.response?.data || "Ocurrió un problema en el servidor.");
         console.error("Error al guardar cliente:", error);
+        this.$nextTick(() => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
         setTimeout(() => {
           this.errorMensaje = null;
         }, 3000);
@@ -461,6 +478,9 @@ export default {
           this.resultadoConsulta
         );
         this.exitoMensaje = `Cliente con cédula ${this.cliente.cedula} ha sido actualizado.`;
+        this.$nextTick(() => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
         this.limpiarTodo();
         setTimeout(() => {
           this.exitoMensaje = null;
@@ -485,6 +505,9 @@ export default {
       try {
         await eliminarClientePorCedulaFachada(this.cliente.cedula);
         this.exitoMensaje = "Cliente eliminado exitosamente.";
+        this.$nextTick(() => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
         setTimeout(() => {
           this.exitoMensaje = null;
         }, 3000);
@@ -493,6 +516,9 @@ export default {
           "Error: " +
           (error.response?.data || "No se pudo eliminar el cliente.");
         console.error("Error al eliminar cliente:", error);
+        this.$nextTick(() => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
         setTimeout(() => {
           this.errorMensaje = null;
         }, 3000);
@@ -531,10 +557,10 @@ export default {
         this.errorMensaje =
           "Error: " +
           (error.response?.data || "No se pudo consultar las facturas.");
-          console.error("Error al consultar facturas:", error);
-          setTimeout(() => {
-            this.errorMensaje = null;
-          }, 3000);
+        console.error("Error al consultar facturas:", error);
+        setTimeout(() => {
+          this.errorMensaje = null;
+        }, 3000);
       }
     },
     calcularTotalGeneral() {
