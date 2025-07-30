@@ -1,6 +1,6 @@
 <template>
   <button @click="regresar" class="btn btn-secondary btn-regresar" :title="titulo">
-    <i class="bi bi-arrow-left"></i> {{ texto }}
+    <i :class="icono"></i> {{ texto }}
   </button>
 </template>
 
@@ -30,6 +30,12 @@ export default {
       type: String,
       required: false,
       default: "Volver a la página anterior",
+    },
+
+    icono: {
+      type: String,
+      required: false,
+      default: "bi bi-arrow-left-circle",
     },
   },
   methods: {

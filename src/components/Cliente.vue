@@ -574,12 +574,7 @@ export default {
 </script>
 
 <style src="@/css/EstilosCrud.css" scoped>
-.boton-eliminar {
-  background-color: #dc3545;
-}
-.boton-eliminar:hover {
-  background-color: #c82333;
-}
+
 .resultado {
   margin-top: 20px;
   padding: 15px;

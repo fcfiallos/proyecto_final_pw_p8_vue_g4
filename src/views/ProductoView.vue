@@ -5,6 +5,7 @@
         :ruta="`/`"
         :texto="'Volver a Inicio'"
         class="boton-inicio"
+        :icono="'bi bi-house-door'"
       />
       <h1>Gestión de Productos</h1>
     </div>

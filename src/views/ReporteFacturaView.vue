@@ -1,7 +1,14 @@
 <template>
   <div class="reporte-factura container-fluid">
-    <div class="header-container d-flex justify-content-between align-items-center mb-4">
-      <BotonRegresar :ruta="'/'" :texto="'Volver a Inicio'" class="boton-inicio" />
+    <div
+      class="header-container d-flex justify-content-between align-items-center mb-4"
+    >
+      <BotonRegresar
+        :ruta="'/'"
+        :texto="'Volver a Inicio'"
+        class="boton-inicio"
+        :icono="'bi bi-house-door'"
+      />
       <h1 class="text-center">Reporte de Facturas</h1>
     </div>
 

@@ -119,7 +119,7 @@
         ><i class="bi bi-exclamation-circle"></i>
         {{ mensaje.codigoMensaje }}</span
       >
-      <button class="boton" @click="eliminar">Eliminar</button>
+      <button class="boton-eliminar" @click="eliminar">Eliminar</button>
     </div>
   </div>
 </template>
