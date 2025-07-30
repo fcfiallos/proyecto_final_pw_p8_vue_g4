@@ -23,8 +23,6 @@
       </p>
     </div>
 
-    <!-- 3. FORMULARIOS DINÁMICOS BASADOS EN LA OPCIÓN SELECCIONADA -->
-
     <!-- Formulario para CONSULTAR -->
     <div class="container-consultar" v-if="opcionSeleccionada === 'consultar'">
       <h3>Consultar Cliente por Cédula</h3>
@@ -152,36 +150,64 @@
     </div>
   </div>
   <div class="container-facturas" v-if="opcionSeleccionada === 'facturas'">
-    <h3>Consultar Facturas por Cédula</h3>
-    <input
-      type="text"
-      v-model="cliente.cedula"
-      placeholder="Ingrese la cédula del cliente"
-      @keyup.enter="consultarFacturas"
-    />
-    <button class="boton" @click="consultarFacturas">Ver Facturas</button>
+    <!-- Formulario de Búsqueda Centrado -->
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-8 col-lg-6">
+        <div class="facturas-form-section">
+          <h3 class="text-center mb-4">
+            <i class="bi bi-receipt"></i> Consultar Facturas por Cédula
+          </h3>
+          <div class="form-group">
+            <label for="cedula-facturas" class="form-label text-center d-block">
+              <strong>Ingrese la Cédula del Cliente:</strong>
+            </label>
+            <input
+              id="cedula-facturas"
+              type="text"
+              v-model="cliente.cedula"
+              placeholder="Ej: 1722586890"
+              class="form-control mb-3 text-center"
+              @keyup.enter="consultarFacturas"
+            />
+            <button class="btn btn-success w-100" @click="consultarFacturas">
+              <i class="bi bi-search"></i> Ver Facturas
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    <!-- Tabla para mostrar los resultados -->
-    <div class="resultado" v-if="listaFacturas && listaFacturas.length > 0">
-      <h4>Facturas Encontradas:</h4>
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>Número de Documento</th>
-            <th>Nombre Cliente</th>
-            <th>Total Impuestos</th>
-            <th>TOTAL</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="factura in listaFacturas" :key="factura.numeroDocumento">
-            <td>{{ factura.numeroDocumento }}</td>
-            <td>{{ factura.nombreCliente }}</td>
-            <td>${{ factura.totalImpuestos.toFixed(2) }}</td>
-            <td>${{ factura.total.toFixed(2) }}</td>
-          </tr>
-        </tbody>
-      </table>
+    <!-- Separador visual -->
+    <hr class="my-5" v-if="listaFacturas && listaFacturas.length > 0" />
+
+    <!-- Tabla de Resultados -->
+    <div
+      class="resultado-facturas"
+      v-if="listaFacturas && listaFacturas.length > 0"
+    >
+      <h4 class="mb-4 text-center">
+        <i class="bi bi-receipt-cutoff"></i> Facturas Encontradas
+      </h4>
+      <div class="table-responsive">
+        <table class="table table-striped table-hover table-bordered">
+          <thead class="table-dark">
+            <tr>
+              <th># Documento</th>
+              <th>Nombre Cliente</th>
+              <th>Total Impuestos</th>
+              <th>TOTAL</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="factura in listaFacturas" :key="factura.numeroDocumento">
+              <td>{{ factura.numeroDocumento }}</td>
+              <td>{{ factura.nombreCliente }}</td>
+              <td>${{ factura.totalImpuestos.toFixed(2) }}</td>
+              <td class="fw-bold">${{ factura.total.toFixed(2) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </template>
@@ -301,14 +327,12 @@ export default {
     },
 
     async guardar() {
-      
       this.exitoMensaje = null;
-      this.errorMensaje = null; 
-      this.limpiarMensajesValidacion(); 
+      this.errorMensaje = null;
+      this.limpiarMensajesValidacion();
 
-      let hayErrores = false; 
+      let hayErrores = false;
 
-     
       // Validación para Cédula
       const cedulaStr = String(this.cliente.cedula || "").trim();
       if (cedulaStr === "") {
@@ -455,6 +479,12 @@ export default {
           (error.response?.data || "No se pudo consultar las facturas.");
       }
     },
+    calcularTotalGeneral() {
+      return this.listaFacturas.reduce(
+        (total, factura) => total + factura.total,
+        0
+      );
+    },
   },
 };
 </script>
@@ -478,5 +508,292 @@ export default {
   font-size: 0.875em;
   margin-top: 4px;
   display: block;
+}
+
+.container-facturas {
+  width: 100%;
+  margin-top: 2rem;
+}
+
+.facturas-form-section {
+  background-color: #f8f9fa; /* Un gris muy claro */
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.form-container-centrado {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.form-container-centrado h3 {
+  color: #2c3e50;
+  font-weight: 600;
+  margin-bottom: 25px;
+}
+
+.form-centrado {
+  max-width: 450px;
+  width: 100%;
+  padding: 0;
+}
+
+.form-label {
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 15px;
+  display: block;
+}
+
+.form-control {
+  padding: 12px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 100%;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #42b983;
+  box-shadow: 0 0 0 0.2rem rgba(66, 185, 131, 0.25);
+  transform: translateY(-1px);
+}
+
+.btn-success {
+  background-color: #42b983;
+  border-color: #42b983;
+  padding: 12px 20px;
+  font-weight: 600;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(66, 185, 131, 0.3);
+  width: 100%;
+  max-width: 100%;
+}
+
+.btn-success:hover {
+  background-color: #369870;
+  border-color: #369870;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(66, 185, 131, 0.4);
+}
+
+.btn-success:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(66, 185, 131, 0.3);
+}
+
+.separador-facturas {
+  border: none;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #4297b9, transparent);
+  margin: 30px 0;
+  opacity: 0.6;
+}
+
+.resultado-facturas {
+  padding: 1.5rem;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.resultado-facturas h4 {
+  color: #2c3e50;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.table-responsive {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.table {
+  margin-bottom: 0;
+}
+
+.table thead th {
+  border: none;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+  letter-spacing: 0.5px;
+  padding: 15px 12px;
+}
+
+.table tbody td {
+  padding: 12px;
+  vertical-align: middle;
+  border-color: #e9ecef;
+}
+
+.table-row-hover:hover {
+  background-color: #e3f2fd !important;
+  transition: background-color 0.2s ease;
+}
+
+.card {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+.card-body h6 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+
+.card-body h4 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .facturas-form-section {
+    padding: 20px 15px;
+    margin-bottom: 15px;
+    width: 95%;
+    max-width: 500px;
+  }
+
+  .form-centrado {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .form-container-centrado h3 {
+    font-size: 1.3rem;
+  }
+
+  .form-control {
+    font-size: 0.9rem;
+    padding: 10px 12px;
+  }
+
+  .btn-success {
+    font-size: 0.9rem;
+    padding: 10px 16px;
+  }
+
+  .separador-facturas {
+    margin: 20px 0;
+  }
+
+  .resultado-facturas {
+    padding: 15px;
+    margin-top: 15px;
+    width: 98%;
+  }
+
+  .table thead th {
+    font-size: 0.75rem;
+    padding: 10px 8px;
+  }
+
+  .table tbody td {
+    font-size: 0.875rem;
+    padding: 10px 8px;
+  }
+
+  .card-body h4 {
+    font-size: 1.5rem;
+  }
+
+  .card-body h6 {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .facturas-form-section {
+    padding: 15px 10px;
+    width: 98%;
+    max-width: none;
+  }
+
+  .form-centrado {
+    padding: 0;
+  }
+
+  .form-container-centrado h3 {
+    font-size: 1.1rem;
+  }
+
+  .form-label {
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+  }
+
+  .form-control {
+    font-size: 0.85rem;
+    padding: 8px 10px;
+  }
+
+  .btn-success {
+    font-size: 0.85rem;
+    padding: 8px 12px;
+  }
+
+  .resultado-facturas {
+    width: 100%;
+    margin: 15px 0;
+  }
+
+  .resultado-facturas h4 {
+    font-size: 1.25rem;
+  }
+
+  .table thead th,
+  .table tbody td {
+    font-size: 0.75rem;
+    padding: 8px 6px;
+  }
+
+  .card-body {
+    padding: 15px;
+  }
+
+  .card-body h4 {
+    font-size: 1.25rem;
+  }
+}
+
+/* Animaciones suaves */
+.table-responsive {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+hr {
+  border: none;
+  height: 1px;
+  background-color: #e0e0e0;
 }
 </style>
