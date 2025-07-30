@@ -6,17 +6,19 @@
         :texto="'Volver a Inicio'"
         class="boton-inicio"
       />
-      <h1>Gestión de Facturas</h1>
     </div>
   </div>
+  <Factura />
 </template>
 
 <script>
 import BotonRegresar from "@/components/BotonRegresar.vue";
+import Factura from "@/components/Factura.vue";
 export default {
   name: "FacturaView",
   components: {
     BotonRegresar,
+    Factura,
   },
 };
 </script>

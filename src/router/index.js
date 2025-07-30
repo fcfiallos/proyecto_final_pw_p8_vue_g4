@@ -35,7 +35,7 @@ const routes = [
     path: '/factura',
     name: 'factura',
     component: () => import('@/views/FacturaView.vue'),
-    meta: { requiereAuth: true }
+    meta: { requiereAuth: false }
   },
   {
     path: '/reporte-factura',
