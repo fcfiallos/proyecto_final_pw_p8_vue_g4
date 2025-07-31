@@ -53,49 +53,42 @@
       <div class="formulario">
         <label>Cédula</label>
         <input type="text" v-model="cliente.cedula" />
-        <!-- Mensaje de validación para Cédula -->
         <span class="error-campo" v-if="mensajesValidacion.cedula">{{
           mensajesValidacion.cedula
         }}</span>
 
         <label>Nombre</label>
         <input type="text" v-model="cliente.nombre" />
-        <!-- Mensaje de validación para Nombre -->
         <span class="error-campo" v-if="mensajesValidacion.nombre">{{
           mensajesValidacion.nombre
         }}</span>
 
         <label>Apellido</label>
         <input type="text" v-model="cliente.apellido" />
-        <!-- Mensaje de validación para Apellido -->
         <span class="error-campo" v-if="mensajesValidacion.apellido">{{
           mensajesValidacion.apellido
         }}</span>
 
         <label>Razón Social</label>
         <input type="text" v-model="cliente.razonSocial" />
-        <!-- Mensaje de validación para Razón Social (si lo necesitas) -->
         <span class="error-campo" v-if="mensajesValidacion.razonSocial">{{
           mensajesValidacion.razonSocial
         }}</span>
 
         <label>Dirección</label>
         <input type="text" v-model="cliente.direccion" />
-        <!-- Mensaje de validación para Dirección -->
         <span class="error-campo" v-if="mensajesValidacion.direccion">{{
           mensajesValidacion.direccion
         }}</span>
 
         <label>Teléfono</label>
         <input type="text" v-model="cliente.telefono" />
-        <!-- Mensaje de validación para Teléfono -->
         <span class="error-campo" v-if="mensajesValidacion.telefono">{{
           mensajesValidacion.telefono
         }}</span>
 
         <label>Email</label>
         <input type="email" v-model="cliente.email" />
-        <!-- Mensaje de validación para Email -->
         <span class="error-campo" v-if="mensajesValidacion.email">{{
           mensajesValidacion.email
         }}</span>
@@ -214,7 +207,6 @@
 </template>
 
 <script>
-// Importamos los componentes hijos y la fachada del cliente
 import BotonRegresar from "@/components/BotonRegresar.vue";
 import OpcionesSeleccion from "@/components/OpcionesSeleccion.vue";
 import {
@@ -291,7 +283,6 @@ export default {
     };
   },
   methods: {
-    // Métodos para manejar la UI
     seleccionarOpcion(opcion) {
       this.opcionSeleccionada = opcion;
       this.limpiarTodo();
@@ -387,7 +378,6 @@ export default {
 
       let hayErrores = false;
 
-      // Validación para Cédula
       const cedulaStr = String(this.cliente.cedula || "").trim();
       if (cedulaStr === "") {
         this.mensajesValidacion.cedula = "La cédula es obligatoria.";
@@ -401,19 +391,14 @@ export default {
           "La cédula debe tener exactamente 10 dígitos.";
         hayErrores = true;
       }
-
-      // Validación para Nombre
       if (!this.cliente.nombre || this.cliente.nombre.trim() === "") {
         this.mensajesValidacion.nombre = "El nombre es obligatorio.";
         hayErrores = true;
       }
-
-      // Validación para Apellido
       if (!this.cliente.apellido || this.cliente.apellido.trim() === "") {
         this.mensajesValidacion.apellido = "El apellido es obligatorio.";
         hayErrores = true;
       }
-      // Validación para Dirección
       if (!this.cliente.direccion || this.cliente.direccion.trim() === "") {
         this.mensajesValidacion.direccion = "La dirección es obligatoria.";
         hayErrores = true;
@@ -424,12 +409,10 @@ export default {
         this.mensajesValidacion.telefono = "El teléfono es obligatorio.";
         hayErrores = true;
       } else if (!/^[0-9]+$/.test(telefonoStr)) {
-        // Verificamos que solo contenga números
         this.mensajesValidacion.telefono =
           "El teléfono solo debe contener números.";
         hayErrores = true;
       } else if (telefonoStr.length !== 10) {
-        // Verificamos que la longitud sea exactamente 10
         this.mensajesValidacion.telefono =
           "El teléfono debe tener exactamente 10 dígitos.";
         hayErrores = true;
@@ -525,7 +508,6 @@ export default {
       }
     },
     async consultarFacturas() {
-      // Limpiamos resultados anteriores para evitar confusiones
       this.exitoMensaje = null;
       this.errorMensaje = null;
       this.listaFacturas = [];
@@ -535,7 +517,6 @@ export default {
         return;
       }
       try {
-        // Usamos la fachada del reporte de facturas
         const data = await obtenerReporteFacturasPorCedulaFachada(
           this.cliente.cedula
         );

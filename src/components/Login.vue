@@ -293,25 +293,21 @@ export default {
         hayErrores = true;
       }
 
-      // Validación para Nombre
       if (!this.cliente.nombre || this.cliente.nombre.trim() === "") {
         this.mensajesValidacion.nombre = "El nombre es obligatorio.";
         hayErrores = true;
       }
 
-      // Validación para Apellido
       if (!this.cliente.apellido || this.cliente.apellido.trim() === "") {
         this.mensajesValidacion.apellido = "El apellido es obligatorio.";
         hayErrores = true;
       }
 
-      // Validación para Dirección
       if (!this.cliente.direccion || this.cliente.direccion.trim() === "") {
         this.mensajesValidacion.direccion = "La dirección es obligatoria.";
         hayErrores = true;
       }
 
-      // Validación para Teléfono
       const telefonoStr = String(this.cliente.telefono || "").trim();
       if (telefonoStr === "") {
         this.mensajesValidacion.telefono = "El teléfono es obligatorio.";
@@ -325,7 +321,6 @@ export default {
         hayErrores = true;
       }
 
-      // Validación para Email
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!this.cliente.email || this.cliente.email.trim() === "") {
         this.mensajesValidacion.email = "El email es obligatorio.";
@@ -335,7 +330,6 @@ export default {
         hayErrores = true;
       }
 
-      // Si se encontró algún error, detenemos la ejecución.
       if (hayErrores) {
         return;
       }

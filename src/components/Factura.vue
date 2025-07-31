@@ -552,7 +552,6 @@ export default {
         this.establecimiento = "";
         this.puntoEmision = "";
 
-        // Reset error displays
         this.mostrarErrorRuc = false;
         this.mostrarErrorCedula = false;
         this.mostrarErrorCodigoBarras = false;
@@ -579,7 +578,6 @@ export default {
           subtotal: this.cantidad * this.precio,
           impuestos: this.producto.impuestos || [],
         });
-        // Mostrar mensaje de éxito
         this.mostrarExito(
           `Producto "${this.producto.nombre}" añadido a la factura.`
         );

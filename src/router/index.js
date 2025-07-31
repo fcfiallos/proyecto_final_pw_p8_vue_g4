@@ -66,7 +66,6 @@ router.beforeEach((to, from, next) => {
   const estaLogueado = !!cedulaGuardada;
   console.log(`¿Usuario está logueado? (hay cédula guardada):`, estaLogueado, `(Valor: ${cedulaGuardada})`);
 
-  // 3. Aplicamos la lógica de redirección
   if (necesitaAuth && !estaLogueado) {
 
     next({ name: 'login' });

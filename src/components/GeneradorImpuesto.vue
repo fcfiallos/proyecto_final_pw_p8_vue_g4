@@ -125,7 +125,6 @@ import {
 export default {
   name: "GeneradorImpuesto",
   props: {
-    // Array de IDs de impuestos seleccionados desde el componente padre
     impuestosSeleccionados: {
       type: Array,
       default: () => []
@@ -134,7 +133,7 @@ export default {
   data() {
     return {
       impuestosDisponibles: [],
-      impuestosSeleccionadosLocal: [], // Para manejo interno
+      impuestosSeleccionadosLocal: [], 
       nuevoImpuesto: { nombre: "", valor: 0, descripcion: "" },
       mostrarFormulario: false,
       cargando: false,
@@ -144,14 +143,12 @@ export default {
   watch: {
     impuestosSeleccionados: {
       handler(nuevosSeleccionados) {
-        // Actualizar la selección local cuando cambia la propiedad
         this.impuestosSeleccionadosLocal = [...nuevosSeleccionados];
       },
       immediate: true
     }
   },
   methods: {
-    // Cargar impuestos disponibles desde el backend
     async cargarImpuestosDisponibles() {
       this.cargando = true;
       try {
@@ -198,7 +195,6 @@ export default {
         this.nuevoImpuesto = { nombre: "", valor: 0, descripcion: "" };
         this.mostrarFormulario = false;
 
-        // Recargar lista de impuestos disponibles
         await this.cargarImpuestosDisponibles();
       } catch (error) {
         console.error("Error al crear impuesto:", error);

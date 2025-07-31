@@ -12,6 +12,7 @@
       @opcion-seleccionada="seleccionarOpcion"
     />
 
+    <!-- Mensajes de éxito y error -->
     <div class="container-mensaje">
       <p v-if="exitoMensaje" id="exitoMensaje">
         <i class="bi bi-check-square"></i> {{ exitoMensaje }}
@@ -20,6 +21,8 @@
         <i class="bi bi-exclamation-square"></i> {{ errorMensaje }}
       </p>
     </div>
+
+    <!-- Formularios para consultar -->
     <div class="container-consultar" v-if="opcionSeleccionada === 'consultar'">
       <h3>Consultar Bodega</h3>
       <label>Ingresa el c&oacute;digo de la bodega que deseas consultar</label>
@@ -34,6 +37,8 @@
         <p>Ubicaci&oacute;n: {{ ubicacion }}</p>
       </div>
     </div>
+
+    <!-- Formularios para guardar -->
     <div class="container-guardar" v-if="opcionSeleccionada === 'guardar'">
       <h3>Crear una Nueva Bodega</h3>
       <p>Es necesario llenar todos los campos para guardar la bodega.</p>
@@ -74,6 +79,8 @@
       </div>
       <button class="boton" @click="guardar">Guardar</button>
     </div>
+
+    <!-- Formularios para actualizar -->
     <div
       class="container-actualizar"
       v-if="opcionSeleccionada === 'actualizar'"
@@ -111,6 +118,8 @@
       </div>
       <button class="boton" @click="actualizar">Actualizar</button>
     </div>
+
+    <!-- Formularios para eliminar -->
     <div class="container-eliminar" v-if="opcionSeleccionada === 'eliminar'">
       <h3>Eliminar Bodega</h3>
       <p>Ingresa el c&oacute;digo de la bodega que deseas eliminar</p>
@@ -264,7 +273,6 @@ export default {
         this.limpiarMensajes();
         let hayErrores = false;
 
-        // Validar todos los campos obligatorios
         if (!this.codigo || this.codigo.trim() === "") {
           this.mensaje.codigoMensaje = "El código es obligatorio";
           hayErrores = true;
@@ -287,7 +295,6 @@ export default {
           }, 3000);
         }
 
-        // Si hay errores, no continuar
         if (hayErrores) {
           return;
         }
@@ -332,16 +339,13 @@ export default {
         this.limpiarMensajes();
         let hayErrores = false;
 
-        // Validar que al menos tengamos el código (necesario para identificar la bodega)
         if (!this.codigo || this.codigo.trim() === "") {
           this.mensaje.codigoMensaje = "El código es obligatorio";
           return;
         }
 
-        // Crear un objeto que solo contendrá los campos modificados
         const bodegaActualizada = {};
 
-        // Solo incluir campos si tienen valor y han sido modificados
         if (this.nombre && this.nombre.trim() !== "") {
           bodegaActualizada.nombre = this.nombre.trim();
         }
@@ -350,7 +354,6 @@ export default {
           bodegaActualizada.ubicacion = this.ubicacion.trim();
         }
 
-        // Verificar que al menos hay un campo para actualizar
         if (Object.keys(bodegaActualizada).length === 0) {
           this.mensaje.generalMensaje = "No hay cambios para actualizar";
           setTimeout(() => {

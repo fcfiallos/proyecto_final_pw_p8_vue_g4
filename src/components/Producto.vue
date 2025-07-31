@@ -11,6 +11,8 @@
       :opcion-seleccionada="opcionSeleccionada"
       @opcion-seleccionada="seleccionarOpcion"
     />
+
+    <!-- Mensajes de éxito y error -->
     <div class="container-mensaje">
       <p v-if="exitoMensaje" id="exitoMensaje">
         <i class="bi bi-check-square"></i> {{ exitoMensaje }}
@@ -19,6 +21,8 @@
         <i class="bi bi-exclamation-square"></i> {{ errorMensaje }}
       </p>
     </div>
+
+    <!-- Formulario de consulta -->
     <div class="container-consultar" v-if="opcionSeleccionada === 'consultar'">
       <h3>Consultar Producto</h3>
       <label>
@@ -51,6 +55,8 @@
         <p v-else>Sin impuestos aplicados</p>
       </div>
     </div>
+
+    <!-- Formulario de guardar -->
     <div class="container-guardar" v-if="opcionSeleccionada === 'guardar'">
       <h3>Crear un Nuevo Producto</h3>
       <p>Es necesario llenar todos los campos para guardar el producto.</p>
@@ -144,6 +150,8 @@
       </div>
       <button class="boton" @click="guardar">Guardar</button>
     </div>
+
+    <!-- Formulario de actualizar -->
     <div
       class="container-actualizar"
       v-if="opcionSeleccionada === 'actualizar'"
@@ -238,6 +246,8 @@
       </div>
       <button class="boton" @click="actualizar">Actualizar</button>
     </div>
+
+    <!-- Formulario de eliminar -->
     <div class="container-eliminar" v-if="opcionSeleccionada === 'eliminar'">
       <h3>Eliminar Producto</h3>
       <p>Ingresa el c&oacute;digo de barras del producto que deseas eliminar</p>
@@ -365,23 +375,10 @@ export default {
     async cargarBodegasDisponibles() {
       try {
         this.bodegasDisponibles = await obtenerTodasBodegasFachada();
-        console.log("Bodegas cargadas:", this.bodegasDisponibles);
-        console.log("Número de bodegas:", this.bodegasDisponibles.length);
-
-        // Debug: Mostrar estructura de cada bodega
-        if (this.bodegasDisponibles.length > 0) {
-          console.log("Primera bodega completa:", this.bodegasDisponibles[0]);
-          console.log(
-            "Campos disponibles:",
-            Object.keys(this.bodegasDisponibles[0])
-          );
-        }
       } catch (error) {
         console.error("Error al cargar bodegas:", error);
 
-        // Si es error 405, mostrar mensaje más específico
         if (error.response && error.response.status === 405) {
-          console.warn("El endpoint para obtener bodegas no está disponible");
           this.bodegasDisponibles = [];
         } else {
           this.errorMensaje = "Error al cargar las bodegas disponibles";
@@ -414,7 +411,6 @@ export default {
         this.precio = response.precio;
         this.stock = response.stock;
         this.categoria = response.categoria;
-        // Usar ID si existe, sino código
         this.bodegaId = response.bodega
           ? response.bodega.id || response.bodega.codigo
           : null;
@@ -449,7 +445,6 @@ export default {
 
         this.obtenerImpuestosDisponibles();
 
-        // Validar todos los campos obligatorios
         if (!this.codigoBarras || this.codigoBarras.trim() === "") {
           this.mensaje.codigoBarrasMensaje =
             "El código de barras es obligatorio";
@@ -474,25 +469,15 @@ export default {
           hayErrores = true;
         }
 
-        // Debug: Verificar el valor de bodegaId
-        console.log(
-          "Valor de bodegaId:",
-          this.bodegaId,
-          "Tipo:",
-          typeof this.bodegaId
-        );
-
         if (!this.bodegaId || this.bodegaId === "" || this.bodegaId === null) {
           this.mensaje.bodegaMensaje = "La bodega es obligatoria";
           hayErrores = true;
         }
 
-        // Si hay errores, no continuar
         if (hayErrores) {
           return;
         }
 
-        // Encontrar la bodega seleccionada
         const bodegaSeleccionada = this.bodegasDisponibles.find(
           (b) =>
             (b.id && b.id === this.bodegaId) ||
@@ -510,7 +495,6 @@ export default {
             bodegaObj.codigo = bodegaSeleccionada.codigo;
           }
         } else {
-          // Si no encontramos la bodega, usar el valor seleccionado como fallback
           bodegaObj.id = this.bodegaId;
         }
 
@@ -524,11 +508,6 @@ export default {
           impuestos: this.impuestosSeleccionados.map((id) => ({ id })),
         };
 
-        console.log("=== PRODUCTO A ENVIAR ===");
-        console.log("Estructura completa:", JSON.stringify(producto, null, 2));
-        console.log("bodega.id:", producto.bodega.id);
-        console.log("bodega.codigo:", producto.bodega.codigo);
-        console.log("========================");
         await guardarFachada(producto);
         this.exitoMensaje = "Producto guardado exitosamente";
         this.$nextTick(() => {
@@ -554,7 +533,6 @@ export default {
         this.limpiarMensajes();
         let hayErrores = false;
 
-        // Validar todos los campos obligatorios
         if (!this.codigoBarras || this.codigoBarras.trim() === "") {
           this.mensaje.codigoBarrasMensaje =
             "El código de barras es obligatorio";
@@ -598,14 +576,11 @@ export default {
           return;
         }
 
-        // Encontrar la bodega seleccionada
         const bodegaSeleccionada = this.bodegasDisponibles.find(
           (b) =>
             (b.id && b.id === this.bodegaId) ||
             (b.codigo && b.codigo === this.bodegaId)
         );
-
-        console.log("Bodega seleccionada para actualizar:", bodegaSeleccionada);
 
         let bodegaObj = {};
         if (bodegaSeleccionada) {
@@ -673,13 +648,6 @@ export default {
           this.exitoMensaje = "No hay cambios que actualizar";
           return;
         }
-
-        console.log("=== CAMPOS A ACTUALIZAR (PATCH) ===");
-        console.log(
-          "Campos modificados:",
-          JSON.stringify(camposActualizados, null, 2)
-        );
-        console.log("=================================");
 
         await actualizarFachada(camposActualizados, this.codigoBarras.trim());
         this.exitoMensaje = "Producto actualizado exitosamente";
@@ -781,13 +749,7 @@ export default {
         typeof generadorRef.getImpuestosDisponibles === "function"
       ) {
         this.impuestosDisponibles = generadorRef.getImpuestosDisponibles();
-        console.log(
-          "Impuestos disponibles obtenidos:",
-          this.impuestosDisponibles
-        );
       } else {
-        console.warn("No se pudo acceder al método getImpuestosDisponibles");
-
         this.impuestosDisponibles = [];
       }
     },
